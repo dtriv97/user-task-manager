@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Data;
+using TaskManager.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=tasks.db"));
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.AddEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -16,8 +17,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseAuthorization();
-app.MapControllers();
 app.UseHttpsRedirection();
 
 app.Run();
