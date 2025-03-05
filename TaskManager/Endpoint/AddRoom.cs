@@ -8,6 +8,7 @@ public record AddRoomRequest
     public required int MaxOccupancy;
 }
 
+[Endpoint(EndpointType.GET)]
 public class AddRoom : ICustomEndpoint<AddRoomRequest, Room>
 {
     public async Task<Room> Handle(AddRoomRequest request)
