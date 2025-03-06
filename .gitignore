@@ -64,6 +64,8 @@ _ReSharper*/
 *.swp
 *.pid
 *.lock
+*.db-wal
+*.db-shm
 
 # Docker
 **/[Dd]ockerfile
