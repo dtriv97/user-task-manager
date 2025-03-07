@@ -1,18 +1,20 @@
-namespace TaskManager.Utilities;
-
-using Microsoft.AspNetCore.Mvc;
 using TaskManager.EndpointServices;
+
+namespace TaskManager.Utilities;
 
 public static class AutoEndpointMapping
 {
-    public static void AddEndpoints(this WebApplication app)
+    public static void AddEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api");
+        var baseGroup = app.MapGroup("/api");
 
-        group.MapPost(
-            "addRoom",
-            async ([FromBody] AddRoomRequest request, [FromServices] RoomService roomService) =>
-                await roomService.AddRoom(request)
-        );
+        baseGroup.MapGroup("/room").MapEndpoint<AddRoom>();
+    }
+
+    private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)
+        where TEndpoint : ICustomEndpoint
+    {
+        TEndpoint.Register(app);
+        return app;
     }
 }

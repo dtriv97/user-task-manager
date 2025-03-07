@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using TaskManager.Data;
 using TaskManager.Models;
 
@@ -9,16 +10,14 @@ public record AddRoomRequest
     public required int MaxOccupancy { get; init; }
 }
 
-public class RoomService
+public class AddRoom : ICustomEndpoint
 {
-    private readonly AppDbContext _dbContext;
-
-    public RoomService(AppDbContext dbContext)
+    public static void Register(IEndpointRouteBuilder app)
     {
-        _dbContext = dbContext;
+        app.MapPost("addRoom", Handle).Produces<Room>(StatusCodes.Status201Created);
     }
 
-    public async Task<Room> AddRoom(AddRoomRequest request)
+    private static async Task<Room> Handle(AppDbContext dbContext, AddRoomRequest request)
     {
         var room = new Room
         {
@@ -27,20 +26,9 @@ public class RoomService
             RoomNumber = request.RoomNumber,
         };
 
-        _dbContext.Rooms.Add(room);
-        await _dbContext.SaveChangesAsync();
+        dbContext.Rooms.Add(room);
+        await dbContext.SaveChangesAsync();
 
         return room;
-    }
-
-    public async Task<Room> GetRoom(Guid id)
-    {
-        var room = new Room
-        {
-            Id = id,
-            MaxOccupancy = 4,
-            RoomNumber = 101,
-        };
-        return await Task.FromResult(room);
     }
 }
