@@ -69,3 +69,4 @@ _ReSharper*/
 # Docker
 **/[Dd]ockerfile
 **/docker-compose*
+TaskManager/tasks.db

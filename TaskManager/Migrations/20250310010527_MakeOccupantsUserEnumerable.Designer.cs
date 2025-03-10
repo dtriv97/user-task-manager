@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManager.Data;
 
@@ -10,9 +11,11 @@ using TaskManager.Data;
 namespace TaskManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250310010527_MakeOccupantsUserEnumerable")]
+    partial class MakeOccupantsUserEnumerable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -66,11 +69,9 @@ namespace TaskManager.Migrations
 
             modelBuilder.Entity("TaskManager.Models.User", b =>
                 {
-                    b.HasOne("TaskManager.Models.Room", "Room")
+                    b.HasOne("TaskManager.Models.Room", null)
                         .WithMany("Occupants")
                         .HasForeignKey("RoomId");
-
-                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("TaskManager.Models.Room", b =>

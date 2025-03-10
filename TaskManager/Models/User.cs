@@ -7,4 +7,5 @@ public class User
     public required string LastName { get; init; }
     public DateTime? CheckInTime { get; set; }
     public DateTime? CheckOutTime { get; set; }
+    public Room? Room { get; set; }
 }

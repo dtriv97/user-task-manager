@@ -1,5 +1,6 @@
 using TaskManager.Endpoints;
 using TaskManager.Endpoints.Room;
+using TaskManager.Endpoints.User;
 
 namespace TaskManager.Utilities;
 
@@ -13,7 +14,11 @@ public static class AutoEndpointMapping
             .MapGroup("/room")
             .MapEndpoint<AddRoom>()
             .MapEndpoint<GetRoom>()
-            .MapEndpoint<DeleteRoom>();
+            .MapEndpoint<DeleteRoom>()
+            .MapEndpoint<CheckInUser>()
+            .MapEndpoint<CheckOutUser>();
+
+        baseGroup.MapGroup("/user").MapEndpoint<AddUser>().MapEndpoint<DeleteUser>();
     }
 
     private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)
