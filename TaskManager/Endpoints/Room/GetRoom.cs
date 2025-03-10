@@ -1,11 +1,10 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Data;
+using TaskManager.EndpointServices;
 using TaskManager.Models;
 
-namespace TaskManager.EndpointServices;
+namespace TaskManager.Endpoints.Room;
 
 public class GetRoom : ICustomEndpoint
 {

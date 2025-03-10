@@ -1,4 +1,4 @@
-namespace TaskManager.EndpointServices;
+namespace TaskManager.Endpoints;
 
 public interface ICustomEndpoint
 {
