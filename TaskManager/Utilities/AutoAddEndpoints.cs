@@ -16,9 +16,14 @@ public static class AutoEndpointMapping
             .MapEndpoint<GetRoom>()
             .MapEndpoint<DeleteRoom>()
             .MapEndpoint<CheckInUser>()
-            .MapEndpoint<CheckOutUser>();
+            .MapEndpoint<CheckOutUser>()
+            .MapEndpoint<GetAllRooms>();
 
-        baseGroup.MapGroup("/user").MapEndpoint<AddUser>().MapEndpoint<DeleteUser>();
+        baseGroup
+            .MapGroup("/user")
+            .MapEndpoint<AddUser>()
+            .MapEndpoint<DeleteUser>()
+            .MapEndpoint<GetAllUsers>();
     }
 
     private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)

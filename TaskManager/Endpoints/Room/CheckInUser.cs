@@ -32,25 +32,40 @@ public class CheckInUser : ICustomEndpoint
         CheckInUserRequest request
     )
     {
-        var roomToUpdate = await dbContext.Rooms.FirstOrDefaultAsync(room =>
-            room.RoomNumber == request.RoomNumber
-        );
+        var roomToUpdate = await dbContext
+            .Rooms.Include(r => r.Occupants)
+            .FirstOrDefaultAsync(room => room.RoomNumber == request.RoomNumber);
 
-        var user = await dbContext.Users.FirstOrDefaultAsync(user =>
-            user.UserId == request.OccupantId
-        );
+        var user = await dbContext
+            .Users.Include(u => u.Room)
+            .FirstOrDefaultAsync(user => user.UserId == request.OccupantId);
 
         if (user == null || roomToUpdate == null)
         {
             return TypedResults.NotFound();
         }
 
+        // Check if room is at max occupancy
+        if (roomToUpdate.Occupants.Count >= roomToUpdate.MaxOccupancy)
+        {
+            return TypedResults.NotFound();
+        }
+
+        // Check if user is already checked into another room
+        if (user.Room != null)
+        {
+            // Remove from previous room
+            user.Room.Occupants.Remove(user);
+            user.Room = null;
+        }
+
         // Update room details
-        roomToUpdate.Occupants = roomToUpdate.Occupants.Append(user);
+        roomToUpdate.Occupants.Add(user);
 
         // Update user details
         user.Room = roomToUpdate;
         user.CheckInTime = DateTime.UtcNow;
+        user.CheckOutTime = null;
 
         await dbContext.SaveChangesAsync();
 

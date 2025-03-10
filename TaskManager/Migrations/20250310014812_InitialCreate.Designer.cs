@@ -11,8 +11,8 @@ using TaskManager.Data;
 namespace TaskManager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250306030724_DropTasks")]
-    partial class DropTasks
+    [Migration("20250310014812_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,10 +28,6 @@ namespace TaskManager.Migrations
 
                     b.Property<int>("MaxOccupancy")
                         .HasColumnType("INTEGER");
-
-                    b.PrimitiveCollection<string>("Occupants")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("RoomNumber")
                         .HasColumnType("INTEGER");
@@ -61,9 +57,28 @@ namespace TaskManager.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("RoomId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("UserId");
 
+                    b.HasIndex("RoomId");
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("TaskManager.Models.User", b =>
+                {
+                    b.HasOne("TaskManager.Models.Room", "Room")
+                        .WithMany("Occupants")
+                        .HasForeignKey("RoomId");
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("TaskManager.Models.Room", b =>
+                {
+                    b.Navigation("Occupants");
                 });
 #pragma warning restore 612, 618
         }

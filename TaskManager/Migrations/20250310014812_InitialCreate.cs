@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TaskManager.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,6 @@ namespace TaskManager.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     RoomNumber = table.Column<int>(type: "INTEGER", nullable: false),
-                    Occupants = table.Column<string>(type: "TEXT", nullable: false),
                     MaxOccupancy = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -33,22 +32,33 @@ namespace TaskManager.Migrations
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
                     LastName = table.Column<string>(type: "TEXT", nullable: false),
                     CheckInTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CheckOutTime = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    CheckOutTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    RoomId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_Users_Rooms_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Rooms",
+                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RoomId",
+                table: "Users",
+                column: "RoomId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Rooms");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Rooms");
         }
     }
 }

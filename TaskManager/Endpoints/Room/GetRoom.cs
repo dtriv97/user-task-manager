@@ -37,9 +37,9 @@ public class GetRoom : ICustomEndpoint
         GetRoomRequest request
     )
     {
-        var room = await dbContext.Rooms.FirstOrDefaultAsync(room =>
-            room.RoomNumber == request.RoomNumber
-        );
+        var room = await dbContext
+            .Rooms.Include(r => r.Occupants)
+            .FirstOrDefaultAsync(room => room.RoomNumber == request.RoomNumber);
 
         if (room == null)
         {
