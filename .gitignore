@@ -15,7 +15,6 @@ out/
 *.ide
 
 # Visual Studio specific
-.vscode/
 .vs/
 .idea/
 
