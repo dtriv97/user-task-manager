@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using TaskManager.Data;
 
 namespace TaskManager.Endpoints.Room;
@@ -26,6 +27,16 @@ public class AddRoom : ICustomEndpoint
 
     private static async Task<IResult> Handle(AppDbContext dbContext, AddRoomRequest request)
     {
+        // Check if room number already exists
+        var existingRoom = await dbContext.Rooms.FirstOrDefaultAsync(r =>
+            r.RoomNumber == request.RoomNumber
+        );
+
+        if (existingRoom != null)
+        {
+            return Results.BadRequest($"Room with number {request.RoomNumber} already exists");
+        }
+
         var room = new Models.Room
         {
             Id = Guid.NewGuid(),
