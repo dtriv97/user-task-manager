@@ -13,15 +13,14 @@ public class AddRoom : ICustomEndpoint
     public static void Register(IEndpointRouteBuilder app)
     {
         app.MapPost("addRoom", Handle)
-            .WithName("Room")
             .WithOpenApi(operation =>
-                new(operation)
-                {
-                    Summary = "Adds a new room",
-                    Description =
-                        "Add a new room to the system, with all its configuration details.",
-                }
-            )
+            {
+                operation.Tags = [new() { Name = "Room" }];
+                operation.Summary = "Adds a new room";
+                operation.Description =
+                    "Add a new room to the system, with all its configuration details.";
+                return operation;
+            })
             .Produces<Models.Room>(StatusCodes.Status200OK);
     }
 

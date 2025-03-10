@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TaskManager.Data;
 
 namespace TaskManager.Endpoints.Room;
@@ -15,15 +14,14 @@ public class DeleteRoom : ICustomEndpoint
     public static void Register(IEndpointRouteBuilder app)
     {
         app.MapPost("deleteRoom", Handle)
-            .WithName("Room")
             .WithOpenApi(operation =>
-                new(operation)
-                {
-                    Summary = "Deletes an existing room",
-                    Description =
-                        "Deletes a room from the system, if it exists otherwise returns a not found error.",
-                }
-            )
+            {
+                operation.Tags = [new() { Name = "Room" }];
+                operation.Summary = "Deletes an existing room";
+                operation.Description =
+                    "Deletes a room from the system, if it exists otherwise returns a not found error.";
+                return operation;
+            })
             .Produces<Models.Room>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
     }
