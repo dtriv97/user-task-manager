@@ -1,32 +1,27 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TaskManager.Data;
 
 namespace TaskManager.Endpoints.Room;
 
-public class GetRoom : ICustomEndpoint
+public class DeleteRoom : ICustomEndpoint
 {
-    public record GetRoomRequest
+    public record DeleteRoomRequest
     {
         public required int RoomNumber { get; init; }
     }
 
     public static void Register(IEndpointRouteBuilder app)
     {
-        app.MapPost(
-                "getRoom",
-                async (GetRoomRequest request, AppDbContext dbContext) =>
-                {
-                    return await Handle(dbContext, request);
-                }
-            )
+        app.MapPost("deleteRoom", Handle)
             .WithName("Room")
             .WithOpenApi(operation =>
                 new(operation)
                 {
-                    Summary = "Get a room by its room number",
+                    Summary = "Deletes an existing room",
                     Description =
-                        "Retrieves detailed information about a specific room based on the provided room number.",
+                        "Deletes a room from the system, if it exists otherwise returns a not found error.",
                 }
             )
             .Produces<Models.Room>(StatusCodes.Status200OK)
@@ -35,18 +30,21 @@ public class GetRoom : ICustomEndpoint
 
     private static async Task<Results<Ok<Models.Room>, NotFound>> Handle(
         AppDbContext dbContext,
-        GetRoomRequest request
+        DeleteRoomRequest request
     )
     {
-        var room = await dbContext.Rooms.FirstOrDefaultAsync(room =>
+        var roomToDelete = await dbContext.Rooms.FirstOrDefaultAsync(room =>
             room.RoomNumber == request.RoomNumber
         );
 
-        if (room == null)
+        if (roomToDelete == null)
         {
             return TypedResults.NotFound();
         }
 
-        return TypedResults.Ok(room);
+        dbContext.Rooms.Remove(roomToDelete);
+        await dbContext.SaveChangesAsync();
+
+        return TypedResults.Ok(roomToDelete);
     }
 }

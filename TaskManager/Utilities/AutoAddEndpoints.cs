@@ -9,7 +9,11 @@ public static class AutoEndpointMapping
     {
         var baseGroup = app.MapGroup("/api");
 
-        baseGroup.MapGroup("/room").MapEndpoint<AddRoom>().MapEndpoint<GetRoom>();
+        baseGroup
+            .MapGroup("/room")
+            .MapEndpoint<AddRoom>()
+            .MapEndpoint<GetRoom>()
+            .MapEndpoint<DeleteRoom>();
     }
 
     private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)
