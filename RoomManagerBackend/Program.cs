@@ -22,13 +22,26 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 // Database Setup
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=tasks.db"));
 
+// Add CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    // Enable CORS
+    app.UseCors();
 }
+
 app.UseHttpsRedirection();
 
 app.AddEndpoints();

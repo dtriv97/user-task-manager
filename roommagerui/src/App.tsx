@@ -2,10 +2,41 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Box, Container } from "@mui/material";
+import Home from "./pages/Home";
+import { Container, Card, Typography } from "@mui/material";
+import { Provider } from "jotai";
+import Navigation from "./components/Navigation";
+import AddRoom from "./pages/AddRoom";
+import Room from "./pages/Room";
 
-// Create a theme instance
 const theme = createTheme({
+  typography: {
+    fontFamily: "Poppins, sans-serif",
+    h1: {
+      fontSize: "2.5rem",
+      fontWeight: 600,
+    },
+    h2: {
+      fontSize: "2rem",
+      fontWeight: 500,
+    },
+    h3: {
+      fontSize: "1.5rem",
+      fontWeight: 400,
+    },
+    h4: {
+      fontSize: "1.2rem",
+      fontWeight: 400,
+    },
+    h5: {
+      fontSize: "1rem",
+      fontWeight: 400,
+    },
+    h6: {
+      fontSize: "0.8rem",
+      fontWeight: 400,
+    },
+  },
   palette: {
     primary: {
       main: "#1976d2",
@@ -21,24 +52,30 @@ const theme = createTheme({
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-          <Container
-            maxWidth="lg"
-            sx={{ pt: 4 }}
-          >
+    <Provider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Container>
+          <Router>
+            <Navigation />
             <Routes>
               <Route
                 path="/"
-                element={<div>Room Manager UI - Coming Soon!</div>}
+                element={<Home />}
+              />
+              <Route
+                path="/add-new-room"
+                element={<AddRoom />}
+              />
+              <Route
+                path="/room/:roomNumber"
+                element={<Room />}
               />
             </Routes>
-          </Container>
-        </Box>
-      </Router>
-    </ThemeProvider>
+          </Router>
+        </Container>
+      </ThemeProvider>
+    </Provider>
   );
 }
 
