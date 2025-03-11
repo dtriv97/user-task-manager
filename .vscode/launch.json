@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Task Manager",
+      "name": "Room Manager",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
