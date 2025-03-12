@@ -7,8 +7,8 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAtomValue, useSetAtom } from "jotai";
-import { usersAtom, usersLoadable } from "../atoms";
+import { useAtomValue } from "jotai";
+import { usersLoadable } from "../atoms";
 import { useState } from "react";
 import api from "../services/api";
 import ConfirmModal from "../components/ConfirmModal";
