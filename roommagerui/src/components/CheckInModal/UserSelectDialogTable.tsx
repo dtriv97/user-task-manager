@@ -12,7 +12,7 @@ import {
   Chip,
 } from "@mui/material";
 import { useState } from "react";
-import { User } from "../types/models";
+import { User } from "../../types/models";
 
 export interface UsersTableProps {
   users: User[];

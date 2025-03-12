@@ -9,6 +9,7 @@ import Navigation from "./components/Navigation/Navigation";
 import AddRoom from "./pages/AddRoom";
 import Room from "./pages/Room";
 import AddUser from "./pages/AddUser";
+import User from "./pages/User";
 
 const theme = createTheme({
   typography: {
@@ -75,6 +76,10 @@ function App() {
               <Route
                 path="/add-new-user"
                 element={<AddUser />}
+              />
+              <Route
+                path="/user/:userId"
+                element={<User />}
               />
             </Routes>
           </Router>

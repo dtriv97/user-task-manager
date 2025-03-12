@@ -2,12 +2,12 @@ import React from "react";
 import { Dialog, DialogTitle, CircularProgress, Alert } from "@mui/material";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
-import { usersAtom, usersLoadable } from "../atoms";
-import api from "../services/api";
+import { usersAtom, usersLoadable } from "../../atoms";
+import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import UserSelectDialogTable from "./UserSelectDialogTable";
-import { User } from "../types/models";
-import ConfirmModal, { ConfirmModalProps } from "./ConfirmModal";
+import { User } from "../../types/models";
+import ConfirmModal, { ConfirmModalProps } from "../ConfirmModal";
 
 interface CheckInModalReturn {
   isLoading: boolean;

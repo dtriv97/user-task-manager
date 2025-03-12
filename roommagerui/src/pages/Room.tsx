@@ -14,7 +14,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { roomsAtom } from "../atoms";
 import api from "../services/api";
 import { formatTime } from "../utils/formatTime";
-import { useCheckInModal } from "../components/CheckInModal";
+import { useCheckInModal } from "../components/CheckInModal/CheckInModal";
 
 export default function Room() {
   const { roomNumber } = useParams();
