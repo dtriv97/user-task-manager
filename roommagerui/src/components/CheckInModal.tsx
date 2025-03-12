@@ -2,7 +2,7 @@ import React from "react";
 import { Dialog, DialogTitle, CircularProgress, Alert } from "@mui/material";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
-import { usersAtom } from "../atoms";
+import { usersAtom, usersLoadable } from "../atoms";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import UserSelectDialogTable from "./UserSelectDialogTable";
@@ -27,7 +27,7 @@ export function useCheckInModal({
   const [loading, setLoading] = useState(false);
   const [confirmModalProps, setConfirmModalProps] =
     useState<ConfirmModalProps | null>(null);
-  const userAtomData = useAtomValue(usersAtom);
+  const userAtomData = useAtomValue(usersLoadable);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -61,9 +61,7 @@ export function useCheckInModal({
         open={open}
         onClose={handleClose}
       >
-        <DialogTitle variant="h4">
-          Check-in users to room {roomNumber}
-        </DialogTitle>
+        <DialogTitle variant="h4">Check-in users</DialogTitle>
         {loading && <CircularProgress />}
         {!loading && (
           <UserSelectDialogTable

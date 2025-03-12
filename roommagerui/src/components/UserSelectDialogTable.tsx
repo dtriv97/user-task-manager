@@ -7,10 +7,12 @@ import {
   TableBody,
   DialogActions,
   Button,
+  Typography,
+  Container,
+  Chip,
 } from "@mui/material";
 import { useState } from "react";
 import { User } from "../types/models";
-import { formatTime } from "../utils/formatTime";
 
 export interface UsersTableProps {
   users: User[];
@@ -32,8 +34,6 @@ export default function UserSelectDialogTable({
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell>Check In Time</TableCell>
-              <TableCell>Check Out Time</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -53,11 +53,24 @@ export default function UserSelectDialogTable({
                       : "transparent",
                 }}
               >
-                <TableCell>
-                  {user.firstName} {user.lastName}
+                <TableCell sx={{ paddingLeft: 0 }}>
+                  <Container
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      gap: 2,
+                      paddingLeft: 0,
+                    }}
+                  >
+                    <Typography>
+                      {user.firstName} {user.lastName}
+                    </Typography>
+                    {user.room !== null && (
+                      <Chip label={`Room ${user.room?.roomNumber}`} />
+                    )}
+                  </Container>
                 </TableCell>
-                <TableCell>{formatTime(user.checkInTime)}</TableCell>
-                <TableCell>{formatTime(user.checkOutTime)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

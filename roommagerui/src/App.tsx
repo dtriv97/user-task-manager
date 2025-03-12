@@ -5,9 +5,10 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Home from "./pages/Home";
 import { Container, Card, Typography } from "@mui/material";
 import { Provider } from "jotai";
-import Navigation from "./components/Navigation";
+import Navigation from "./components/Navigation/Navigation";
 import AddRoom from "./pages/AddRoom";
 import Room from "./pages/Room";
+import AddUser from "./pages/AddUser";
 
 const theme = createTheme({
   typography: {
@@ -70,6 +71,10 @@ function App() {
               <Route
                 path="/room/:roomNumber"
                 element={<Room />}
+              />
+              <Route
+                path="/add-new-user"
+                element={<AddUser />}
               />
             </Routes>
           </Router>
