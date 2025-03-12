@@ -1,5 +1,5 @@
 import React from "react";
-import { Dialog, DialogTitle, CircularProgress } from "@mui/material";
+import { Dialog, DialogTitle, CircularProgress, Alert } from "@mui/material";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { usersAtom } from "../atoms";
@@ -7,6 +7,7 @@ import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import UserSelectDialogTable from "./UserSelectDialogTable";
 import { User } from "../types/models";
+import ConfirmModal, { ConfirmModalProps } from "./ConfirmModal";
 
 interface CheckInModalReturn {
   isLoading: boolean;
@@ -21,10 +22,12 @@ interface CheckInModalProps {
 export function useCheckInModal({
   roomNumber,
 }: CheckInModalProps): CheckInModalReturn {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [confirmModalProps, setConfirmModalProps] =
+    useState<ConfirmModalProps | null>(null);
   const userAtomData = useAtomValue(usersAtom);
-  const navigate = useNavigate();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -53,20 +56,40 @@ export function useCheckInModal({
   const users = userAtomData.data;
 
   const CheckInDialog = () => (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-    >
-      <DialogTitle variant="h4">Check In User: Room {roomNumber}</DialogTitle>
-      {loading && <CircularProgress />}
-      {!loading && (
-        <UserSelectDialogTable
-          users={users}
-          handleCancel={handleClose}
-          handleCheckIn={handleCheckIn}
-        />
-      )}
-    </Dialog>
+    <>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogTitle variant="h4">
+          Check-in users to room {roomNumber}
+        </DialogTitle>
+        {loading && <CircularProgress />}
+        {!loading && (
+          <UserSelectDialogTable
+            users={users}
+            handleCancel={handleClose}
+            handleCheckIn={(user) => {
+              if (user.room !== null) {
+                setConfirmModalProps({
+                  title: `${user.firstName} ${user.lastName} already checked into Room ${user.room?.roomNumber}`,
+                  message: `Would you like to check them out and into Room ${roomNumber}?`,
+                  onConfirm: () => {
+                    handleCheckIn(user);
+                  },
+                  onCancel: () => {
+                    setConfirmModalProps(null);
+                  },
+                });
+              } else {
+                handleCheckIn(user);
+              }
+            }}
+          />
+        )}
+      </Dialog>
+      {confirmModalProps !== null && <ConfirmModal {...confirmModalProps} />}
+    </>
   );
 
   return {
