@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using TaskManager.Data;
+using RoomManagerBackend.Data;
 
-namespace TaskManager.Endpoints.Room;
+namespace RoomManagerBackend.Endpoints.Room;
 
 public class GetAllRooms : ICustomEndpoint
 {

@@ -1,6 +1,6 @@
-using TaskManager.Data;
+using RoomManagerBackend.Data;
 
-namespace TaskManager.Endpoints.User;
+namespace RoomManagerBackend.Endpoints.User;
 
 public class AddUser : ICustomEndpoint
 {

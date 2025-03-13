@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using TaskManager.Data;
+using RoomManagerBackend.Data;
 
-namespace TaskManager.Endpoints.User;
+namespace RoomManagerBackend.Endpoints.User;
 
 public class DeleteUser : ICustomEndpoint
 {

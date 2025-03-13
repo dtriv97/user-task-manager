@@ -1,4 +1,4 @@
-namespace TaskManager.Endpoints;
+namespace RoomManagerBackend.Endpoints;
 
 public interface ICustomEndpoint
 {

@@ -1,4 +1,4 @@
-namespace TaskManager.Models;
+namespace RoomManagerBackend.Models;
 
 public class User
 {

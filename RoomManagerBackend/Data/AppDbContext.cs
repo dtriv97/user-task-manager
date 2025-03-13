@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using TaskManager.Models;
+using RoomManagerBackend.Models;
 
-namespace TaskManager.Data;
+namespace RoomManagerBackend.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {

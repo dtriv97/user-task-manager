@@ -1,8 +1,8 @@
-using TaskManager.Endpoints;
-using TaskManager.Endpoints.Room;
-using TaskManager.Endpoints.User;
+using RoomManagerBackend.Endpoints;
+using RoomManagerBackend.Endpoints.Room;
+using RoomManagerBackend.Endpoints.User;
 
-namespace TaskManager.Utilities;
+namespace RoomManagerBackend.Utilities;
 
 public static class AutoEndpointMapping
 {
