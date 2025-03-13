@@ -14,7 +14,7 @@ export const roomsBaseAtom = atomWithRefresh<Promise<Room[]>>(async () => {
 
 export const roomsAtom = loadable(roomsBaseAtom);
 
-export const usersAtom = atomWithRefresh<Promise<User[]>>(async () => {
+export const usersBaseAtom = atomWithRefresh<Promise<User[]>>(async () => {
   try {
     const users = await api.user.getAllUsers();
     return users;
@@ -23,4 +23,4 @@ export const usersAtom = atomWithRefresh<Promise<User[]>>(async () => {
   }
 });
 
-export const usersLoadable = loadable(usersAtom);
+export const usersLoadable = loadable(usersBaseAtom);

@@ -1,13 +1,12 @@
 import React from "react";
 import { Dialog, DialogTitle, CircularProgress, Alert } from "@mui/material";
-import { useAtomValue } from "jotai";
 import { useState } from "react";
-import { usersAtom, usersLoadable } from "../../atoms";
-import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import UserSelectDialogTable from "./UserSelectDialogTable";
 import { User } from "../../types/models";
 import ConfirmModal, { ConfirmModalProps } from "../ConfirmModal";
+import { useUsers } from "../../services/useUsers";
+import { useRooms } from "../../services/useRooms";
 
 interface CheckInModalReturn {
   isLoading: boolean;
@@ -27,7 +26,8 @@ export function useCheckInModal({
   const [loading, setLoading] = useState(false);
   const [confirmModalProps, setConfirmModalProps] =
     useState<ConfirmModalProps | null>(null);
-  const userAtomData = useAtomValue(usersLoadable);
+  const users = useUsers();
+  const rooms = useRooms();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -35,25 +35,36 @@ export function useCheckInModal({
   const handleCheckIn = async (user: User) => {
     try {
       setLoading(true);
-      await api.room.checkInUser(roomNumber, user.userId);
+      await rooms.checkInUser({
+        roomNumber,
+        occupantId: user.userId,
+      });
+      alert("User checked in successfully");
       navigate(0);
     } catch (error) {
-      console.error(error);
+      alert("Failed to check in user. Please try again.");
     } finally {
       setLoading(false);
       handleClose();
     }
   };
 
-  if (userAtomData.state === "loading" || userAtomData.state === "hasError") {
+  if (users.error || rooms.error) {
+    alert("Failed to load users or rooms. Please try again.");
+    return {
+      isLoading: false,
+      openModal: () => {},
+      CheckInDialog: () => null,
+    };
+  }
+
+  if (users.isLoading || rooms.isLoading) {
     return {
       isLoading: true,
       openModal: () => {},
       CheckInDialog: () => null,
     };
   }
-
-  const users = userAtomData.data;
 
   const CheckInDialog = () => (
     <>
@@ -65,7 +76,7 @@ export function useCheckInModal({
         {loading && <CircularProgress />}
         {!loading && (
           <UserSelectDialogTable
-            users={users}
+            users={users.users}
             handleCancel={handleClose}
             handleCheckIn={(user) => {
               if (user.room !== null) {

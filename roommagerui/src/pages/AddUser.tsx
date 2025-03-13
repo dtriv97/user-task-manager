@@ -6,15 +6,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { usersAtom } from "../atoms";
-import { useSetAtom } from "jotai";
+import { useUsers } from "../services/useUsers";
 
 export default function AddUser() {
+  const users = useUsers();
   const navigate = useNavigate();
-  const refreshUsers = useSetAtom(usersAtom);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUserSubmit = async (formData: FormData) => {
@@ -24,12 +22,8 @@ export default function AddUser() {
         firstName: formData.get("firstName") as string,
         lastName: formData.get("lastName") as string,
       };
-      var userSuccess = await api.user.addUser(
-        userData.firstName,
-        userData.lastName
-      );
-      refreshUsers();
-      navigate("/");
+      var userSuccess = await users.addUser({ ...userData });
+      navigate(`/user/${userSuccess.userId}`);
     } catch (error) {
       alert("Failed to add user. Please try again.");
     } finally {

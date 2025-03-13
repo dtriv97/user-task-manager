@@ -9,13 +9,12 @@ import {
   ListItemButton,
   Chip,
 } from "@mui/material";
-import { useAtomValue } from "jotai";
 import { Link, useNavigate } from "react-router-dom";
-import { roomsAtom } from "../../atoms";
+import { useRooms } from "../../services/useRooms";
 
 export default function RoomList() {
   const navigate = useNavigate();
-  const roomAtom = useAtomValue(roomsAtom);
+  const rooms = useRooms();
 
   return (
     <Box sx={{ overflow: "auto", flexGrow: 1, maxHeight: "50%" }}>
@@ -46,14 +45,14 @@ export default function RoomList() {
           </IconButton>
         </Link>
       </Container>
-      {roomAtom.state === "loading" && (
+      {rooms.isLoading && (
         <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
           <CircularProgress />
         </Box>
       )}
-      {roomAtom.state === "hasData" && (
+      {rooms.rooms.length > 0 ? (
         <List>
-          {roomAtom.data.map((room) => (
+          {rooms.rooms.map((room) => (
             <ListItemButton
               disableTouchRipple
               key={room.roomNumber}
@@ -88,15 +87,14 @@ export default function RoomList() {
               />
             </ListItemButton>
           ))}
-          {roomAtom.data.length === 0 && (
-            <Typography
-              variant="body1"
-              sx={{ padding: 2 }}
-            >
-              No rooms available
-            </Typography>
-          )}
         </List>
+      ) : (
+        <Typography
+          variant="body1"
+          sx={{ padding: 2 }}
+        >
+          No rooms available
+        </Typography>
       )}
     </Box>
   );

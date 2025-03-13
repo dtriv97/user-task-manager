@@ -6,16 +6,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useSetAtom } from "jotai";
-import { roomsBaseAtom } from "../atoms";
+import { useRooms } from "../services/useRooms";
 
 export default function AddRoom() {
+  const rooms = useRooms();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const refreshRooms = useSetAtom(roomsBaseAtom);
 
   const handleRoomSubmit = async (formData: FormData) => {
     try {
@@ -24,9 +22,8 @@ export default function AddRoom() {
         roomNumber: Number(formData.get("roomNumber")),
         maxOccupancy: Number(formData.get("maxOccupancy")),
       };
-      await api.room.addRoom(roomData.roomNumber, roomData.maxOccupancy);
-      refreshRooms();
-      navigate("/");
+      var addedRoom = await rooms.addRoom({ ...roomData });
+      navigate(`/room/${addedRoom.roomNumber}`);
     } catch (error) {
       alert("Failed to add room. Please try again.");
     } finally {

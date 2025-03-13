@@ -3,13 +3,16 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Home from "./pages/Home";
-import { Container, Card, Typography } from "@mui/material";
-import { Provider } from "jotai";
+import { Container } from "@mui/material";
 import Navigation from "./components/Navigation/Navigation";
 import AddRoom from "./pages/AddRoom";
 import Room from "./pages/Room";
 import AddUser from "./pages/AddUser";
 import User from "./pages/User";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// Create a client
+const queryClient = new QueryClient();
 
 const theme = createTheme({
   typography: {
@@ -52,40 +55,46 @@ const theme = createTheme({
   },
 });
 
+function AppContent() {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Container>
+        <Router>
+          <Navigation />
+          <Routes>
+            <Route
+              path="/"
+              element={<Home />}
+            />
+            <Route
+              path="/add-new-room"
+              element={<AddRoom />}
+            />
+            <Route
+              path="/room/:roomNumber"
+              element={<Room />}
+            />
+            <Route
+              path="/add-new-user"
+              element={<AddUser />}
+            />
+            <Route
+              path="/user/:userId"
+              element={<User />}
+            />
+          </Routes>
+        </Router>
+      </Container>
+    </ThemeProvider>
+  );
+}
+
 function App() {
   return (
-    <Provider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Container>
-          <Router>
-            <Navigation />
-            <Routes>
-              <Route
-                path="/"
-                element={<Home />}
-              />
-              <Route
-                path="/add-new-room"
-                element={<AddRoom />}
-              />
-              <Route
-                path="/room/:roomNumber"
-                element={<Room />}
-              />
-              <Route
-                path="/add-new-user"
-                element={<AddUser />}
-              />
-              <Route
-                path="/user/:userId"
-                element={<User />}
-              />
-            </Routes>
-          </Router>
-        </Container>
-      </ThemeProvider>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <AppContent />
+    </QueryClientProvider>
   );
 }
 

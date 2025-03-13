@@ -7,20 +7,18 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAtomValue } from "jotai";
-import { usersLoadable } from "../atoms";
 import { useState } from "react";
-import api from "../services/api";
 import ConfirmModal from "../components/ConfirmModal";
+import { useUsers } from "../services/useUsers";
 
 export default function User() {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const userLoadableAtom = useAtomValue(usersLoadable);
+  const users = useUsers();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
-  if (userLoadableAtom.state === "loading") {
+  if (users.isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
         <CircularProgress />
@@ -28,7 +26,7 @@ export default function User() {
     );
   }
 
-  if (userLoadableAtom.state === "hasError") {
+  if (users.error) {
     return (
       <Box>
         <Typography>User doesn't exist</Typography>
@@ -36,8 +34,7 @@ export default function User() {
     );
   }
 
-  const user = userLoadableAtom.data.find((u) => u.userId === userId);
-  console.log(userLoadableAtom.data);
+  const user = users.users.find((u) => u.userId === userId);
 
   if (!user) {
     return (
@@ -50,7 +47,8 @@ export default function User() {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await api.user.deleteUser(userId!);
+      await users.deleteUser(user.userId);
+      alert("User deleted successfully");
       navigate("/");
     } catch (error) {
       alert("Failed to delete user. Please try again.");

@@ -8,10 +8,20 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000, // 10 second timeout
+  timeout: 10000,
 });
 
-// Add request interceptor for debugging
+export const queryKeys = {
+  rooms: {
+    all: ["rooms"] as const,
+    byNumber: (roomNumber: number) => ["rooms", roomNumber] as const,
+  },
+  users: {
+    all: ["users"] as const,
+    byId: (userId: string) => ["users", userId] as const,
+  },
+};
+
 api.interceptors.request.use(
   (config) => {
     console.log(
@@ -26,10 +36,8 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor for debugging
 api.interceptors.response.use(
   (response) => {
-    console.log("Response:", response);
     return response;
   },
   (error: AxiosError) => {

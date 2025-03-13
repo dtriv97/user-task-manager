@@ -8,13 +8,12 @@ import {
   List,
   ListItemButton,
 } from "@mui/material";
-import { useAtomValue } from "jotai";
 import { useNavigate } from "react-router-dom";
-import { usersLoadable } from "../../atoms";
+import { useUsers } from "../../services/useUsers";
 
 export default function UserList() {
   const navigate = useNavigate();
-  const usersAtom = useAtomValue(usersLoadable);
+  const users = useUsers();
 
   return (
     <Box sx={{ overflow: "auto", flexGrow: 1, maxHeight: "50%" }}>
@@ -43,14 +42,14 @@ export default function UserList() {
           />
         </IconButton>
       </Container>
-      {usersAtom.state === "loading" && (
+      {users.isLoading && (
         <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
           <CircularProgress />
         </Box>
       )}
-      {usersAtom.state === "hasData" && (
+      {users.users.length > 0 ? (
         <List>
-          {usersAtom.data.map((user) => (
+          {users.users.map((user) => (
             <ListItemButton
               disableTouchRipple
               key={user.userId}
@@ -67,15 +66,14 @@ export default function UserList() {
               </Typography>
             </ListItemButton>
           ))}
-          {usersAtom.data.length === 0 && (
-            <Typography
-              variant="body1"
-              sx={{ padding: 2 }}
-            >
-              No users in the system
-            </Typography>
-          )}
         </List>
+      ) : (
+        <Typography
+          variant="body1"
+          sx={{ padding: 2 }}
+        >
+          No users available
+        </Typography>
       )}
     </Box>
   );

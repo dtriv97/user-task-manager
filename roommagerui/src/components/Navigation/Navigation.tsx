@@ -1,7 +1,5 @@
-import { Box, Button, Drawer, Typography, Divider } from "@mui/material";
-import { useAtomValue } from "jotai";
-import { roomsAtom } from "../../atoms";
-import { Link, useNavigate } from "react-router-dom";
+import { Box, Drawer, Typography, Divider } from "@mui/material";
+import { Link } from "react-router-dom";
 import RoomList from "./RoomList";
 import UserList from "./UserList";
 

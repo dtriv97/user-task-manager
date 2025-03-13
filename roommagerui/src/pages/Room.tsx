@@ -9,24 +9,22 @@ import {
   ListItemText,
   CircularProgress,
 } from "@mui/material";
-import { useAtomValue } from "jotai";
 import { useParams, useNavigate } from "react-router-dom";
-import { roomsAtom } from "../atoms";
-import api from "../services/api";
 import { formatTime } from "../utils/formatTime";
 import { useCheckInModal } from "../components/CheckInModal/CheckInModal";
+import { useRooms } from "../services/useRooms";
 
 export default function Room() {
   const { roomNumber } = useParams();
+  const rooms = useRooms();
   const navigate = useNavigate();
-  const roomsData = useAtomValue(roomsAtom);
   const {
     openModal: openCheckInModal,
     CheckInDialog,
     isLoading: isCheckInLoading,
   } = useCheckInModal({ roomNumber: parseInt(roomNumber || "0") });
 
-  if (roomsData.state === "loading") {
+  if (rooms.isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
         <CircularProgress />
@@ -34,7 +32,7 @@ export default function Room() {
     );
   }
 
-  if (roomsData.state === "hasError") {
+  if (rooms.error) {
     return (
       <Container>
         <Card sx={{ p: 2, mt: 2 }}>
@@ -49,7 +47,7 @@ export default function Room() {
     );
   }
 
-  const room = roomsData.data.find(
+  const room = rooms.rooms.find(
     (r) => r.roomNumber === parseInt(roomNumber || "0")
   );
 
@@ -69,7 +67,7 @@ export default function Room() {
 
   const handleCheckOut = async (userId: string) => {
     try {
-      await api.room.checkOutUser(userId);
+      await rooms.checkOutUser(userId);
       navigate(0);
     } catch (error) {
       console.error("Failed to check out user:", error);
