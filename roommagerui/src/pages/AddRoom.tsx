@@ -56,6 +56,7 @@ export default function AddRoom() {
             name="roomNumber"
             label="Room Number"
             type="number"
+            defaultValue={rooms.rooms.length + 1}
           />
           <TextField
             required

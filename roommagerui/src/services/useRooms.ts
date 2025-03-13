@@ -11,6 +11,7 @@ export function useRooms() {
   } = useQuery({
     queryKey: queryKeys.rooms.all,
     queryFn: api.room.getAllRooms,
+    select: (data) => data.sort((a, b) => a.roomNumber - b.roomNumber),
   });
 
   const addRoomMutation = useMutation({
