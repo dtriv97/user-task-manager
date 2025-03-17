@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using RoomManagerBackend.Data;
+using RoomManagerBackend.Services;
 
 namespace RoomManagerBackend.Endpoints.Room;
 
@@ -27,9 +28,10 @@ public class CheckInUser : ICustomEndpoint
             .Produces(StatusCodes.Status404NotFound);
     }
 
-    private static async Task<Results<Ok<Models.Room>, NotFound>> Handle(
+    private static async Task<Results<Ok<Models.Room>, NotFound, BadRequest>> Handle(
         AppDbContext dbContext,
-        CheckInUserRequest request
+        CheckInUserRequest request,
+        IUserResidenceService userResidenceService
     )
     {
         var roomToUpdate = await dbContext
@@ -48,25 +50,19 @@ public class CheckInUser : ICustomEndpoint
         // Check if room is at max occupancy
         if (roomToUpdate.Occupants.Count >= roomToUpdate.MaxOccupancy)
         {
-            return TypedResults.NotFound();
+            return TypedResults.BadRequest();
         }
 
         // Check if user is already checked into another room
         if (user.Room != null)
         {
-            // Remove from previous room
-            user.Room.Occupants.Remove(user);
-            user.Room = null;
+            await userResidenceService.EndUserResidenceSession(user.UserId, user.Room.Id);
         }
 
-        // Update room details
+        await userResidenceService.StartUserResidenceSession(user.UserId, roomToUpdate.Id);
+
         roomToUpdate.Occupants.Add(user);
-
-        // Update user details
         user.Room = roomToUpdate;
-        user.CheckInTime = DateTime.UtcNow;
-        user.CheckOutTime = null;
-
         await dbContext.SaveChangesAsync();
 
         return TypedResults.Ok(roomToUpdate);

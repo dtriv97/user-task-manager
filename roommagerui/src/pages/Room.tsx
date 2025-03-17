@@ -13,6 +13,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { formatTime } from "../utils/formatTime";
 import { useCheckInModal } from "../components/CheckInModal/CheckInModal";
 import { useRooms } from "../services/useRooms";
+import { Group } from "@mui/icons-material";
 
 export default function Room() {
   const { roomNumber } = useParams();
@@ -82,15 +83,12 @@ export default function Room() {
           variant="h4"
           sx={{ mt: 2 }}
         >
-          Occupancy: {room.occupants.length} / {room.maxOccupancy}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Group />
+            {`${room.occupants.length} / ${room.maxOccupancy}`}
+          </Box>
         </Typography>
 
-        <Typography
-          variant="h4"
-          sx={{ mt: 3 }}
-        >
-          Current Occupants:
-        </Typography>
         <List>
           {room.occupants.length === 0 ? (
             <ListItem>

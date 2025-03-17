@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RoomManagerBackend.Data;
+using RoomManagerBackend.Services;
 using RoomManagerBackend.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,8 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
 });
+
+builder.Services.AddScoped<IUserResidenceService, UserResidenceService>();
 
 var app = builder.Build();
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using RoomManagerBackend.Data;
+using RoomManagerBackend.Services;
 
 namespace RoomManagerBackend.Endpoints.Room;
 
@@ -9,6 +10,7 @@ public class CheckOutUser : ICustomEndpoint
     public record CheckOutUserRequest
     {
         public required Guid OccupantId { get; init; }
+        public required Guid RoomId { get; init; }
     }
 
     public static void Register(IEndpointRouteBuilder app)
@@ -28,23 +30,19 @@ public class CheckOutUser : ICustomEndpoint
 
     private static async Task<Results<Ok<Models.User>, NotFound>> Handle(
         AppDbContext dbContext,
-        CheckOutUserRequest request
+        CheckOutUserRequest request,
+        IUserResidenceService userResidenceService
     )
     {
-        var user = await dbContext
-            .Users.Include(u => u.Room)
-            .FirstOrDefaultAsync(user => user.UserId == request.OccupantId);
+        var user = await userResidenceService.EndUserResidenceSession(
+            request.OccupantId,
+            request.RoomId
+        );
 
-        if (user == null || user.Room == null)
+        if (user == null)
         {
             return TypedResults.NotFound();
         }
-
-        // Update user details
-        user.Room = null;
-        user.CheckOutTime = DateTime.UtcNow;
-
-        await dbContext.SaveChangesAsync();
 
         return TypedResults.Ok(user);
     }
