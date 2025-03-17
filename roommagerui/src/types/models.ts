@@ -2,8 +2,6 @@ export interface User {
   userId: string;
   firstName: string;
   lastName: string;
-  checkInTime?: string;
-  checkOutTime?: string;
   room?: Room;
 }
 
@@ -12,4 +10,13 @@ export interface Room {
   roomNumber: number;
   maxOccupancy: number;
   occupants: User[];
+}
+
+export interface UserResidenceSession {
+  id: string;
+  user: User;
+  room: Room;
+  checkInTime: string;
+  checkOutTime?: string;
+  scheduledCheckoutTime?: string;
 }

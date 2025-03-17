@@ -34,8 +34,26 @@ public class UserResidenceService(AppDbContext dbContext) : IUserResidenceServic
         return user;
     }
 
-    public Task<Room> StartUserResidenceSession(Guid userId, Guid roomId)
+    public async Task<Room> StartUserResidenceSession(Guid userId, Guid roomId)
     {
-        throw new NotImplementedException();
+        var user = await _dbContext.Users.FindAsync(userId);
+        var room = await _dbContext.Rooms.FindAsync(roomId);
+
+        if (user == null || room == null)
+        {
+            throw new Exception("User or room not found");
+        }
+
+        var userResidenceSession = new UserResidenceSession
+        {
+            User = user,
+            Room = room,
+            CheckInTime = DateTime.UtcNow,
+        };
+
+        _dbContext.UserResidenceSessions.Add(userResidenceSession);
+        await _dbContext.SaveChangesAsync();
+
+        return room;
     }
 }

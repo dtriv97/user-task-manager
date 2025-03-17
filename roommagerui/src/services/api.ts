@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { Room, User } from "../types/models";
+import { Room, User, UserResidenceSession } from "../types/models";
 
 const API_BASE_URL = "http://localhost:5220/api";
 
@@ -19,6 +19,11 @@ export const queryKeys = {
   users: {
     all: ["users"] as const,
     byId: (userId: string) => ["users", userId] as const,
+  },
+  userResidenceSessions: {
+    all: ["userResidenceSessions"] as const,
+    byUserId: (userId: string) => ["userResidenceSessions", userId] as const,
+    byRoomId: (roomId: string) => ["userResidenceSessions", roomId] as const,
   },
 };
 
@@ -116,7 +121,28 @@ export const userApi = {
   },
 };
 
+// User Residence Session API endpoints
+export const userResidenceSessionApi = {
+  getAllUserResidenceSessions: async (): Promise<UserResidenceSession[]> => {
+    const response = await api.get(
+      "/userResidenceSession/getAllUserResidenceSessions"
+    );
+    return response.data;
+  },
+
+  getUserResidenceSession: async (
+    userId: string
+  ): Promise<UserResidenceSession> => {
+    const response = await api.post(
+      "/userResidenceSession/getUserResidenceSession",
+      { userId }
+    );
+    return response.data;
+  },
+};
+
 export default {
   room: roomApi,
   user: userApi,
+  userResidenceSession: userResidenceSessionApi,
 };

@@ -8,16 +8,19 @@ import {
   ListItem,
   ListItemText,
   CircularProgress,
+  Divider,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { formatTime } from "../utils/formatTime";
 import { useCheckInModal } from "../components/CheckInModal/CheckInModal";
 import { useRooms } from "../services/useRooms";
 import { Group } from "@mui/icons-material";
+import UserResidenceStatus from "../components/UserResidenceStatus";
 
 export default function Room() {
   const { roomNumber } = useParams();
   const rooms = useRooms();
+
   const navigate = useNavigate();
   const {
     openModal: openCheckInModal,
@@ -56,7 +59,9 @@ export default function Room() {
     return (
       <Container>
         <Card sx={{ p: 2, mt: 2 }}>
-          <Typography variant="h4">Room not found</Typography>
+          <Typography variant="h4">
+            There is an issue with the system, please try again later.
+          </Typography>
         </Card>
       </Container>
     );
@@ -90,27 +95,18 @@ export default function Room() {
         </Typography>
 
         <List>
-          {room.occupants.length === 0 ? (
+          {room.occupants?.length === 0 ? (
             <ListItem>
               <ListItemText primary="No current occupants" />
             </ListItem>
           ) : (
             room.occupants.map((occupant) => {
               return (
-                <ListItem key={occupant.userId}>
-                  <ListItemText
-                    primary={`${occupant.firstName} ${occupant.lastName}`}
-                    secondary={`Checked In: ${formatTime(
-                      occupant.checkInTime
-                    )}`}
-                  />
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => handleCheckOut(occupant.userId)}
-                  >
-                    Check Out
-                  </Button>
+                <ListItem
+                  key={occupant.userId}
+                  style={{ width: "100%" }}
+                >
+                  <UserResidenceStatus userId={occupant.userId} />
                 </ListItem>
               );
             })

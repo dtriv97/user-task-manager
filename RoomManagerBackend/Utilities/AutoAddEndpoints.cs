@@ -1,6 +1,7 @@
 using RoomManagerBackend.Endpoints;
 using RoomManagerBackend.Endpoints.Room;
 using RoomManagerBackend.Endpoints.User;
+using RoomManagerBackend.Endpoints.UserResidenceSession;
 
 namespace RoomManagerBackend.Utilities;
 
@@ -24,6 +25,8 @@ public static class AutoEndpointMapping
             .MapEndpoint<AddUser>()
             .MapEndpoint<DeleteUser>()
             .MapEndpoint<GetAllUsers>();
+
+        baseGroup.MapGroup("/userResidenceSession").MapEndpoint<GetUserResidenceSession>();
     }
 
     private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)
