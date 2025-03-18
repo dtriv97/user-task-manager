@@ -10,7 +10,7 @@ public class CheckInUser : ICustomEndpoint
     public record CheckInUserRequest
     {
         public required int RoomNumber { get; init; }
-        public required Guid OccupantId { get; init; }
+        public required Guid UserId { get; init; }
     }
 
     public static void Register(IEndpointRouteBuilder app)
@@ -40,7 +40,7 @@ public class CheckInUser : ICustomEndpoint
 
         var user = await dbContext
             .Users.Include(u => u.Room)
-            .FirstOrDefaultAsync(user => user.UserId == request.OccupantId);
+            .FirstOrDefaultAsync(user => user.UserId == request.UserId);
 
         if (user == null || roomToUpdate == null)
         {

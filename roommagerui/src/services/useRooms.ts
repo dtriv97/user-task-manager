@@ -38,27 +38,46 @@ export function useRooms() {
   const checkInUserMutation = useMutation({
     mutationFn: ({
       roomNumber,
-      occupantId,
+      userId,
     }: {
       roomNumber: number;
-      occupantId: string;
-    }) => api.room.checkInUser(roomNumber, occupantId),
-    onSuccess: (_, { roomNumber, occupantId }) => {
+      userId: string;
+    }) => api.room.checkInUser(roomNumber, userId),
+    onSuccess: (_, { roomNumber, userId }) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.rooms.byNumber(roomNumber),
       });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.users.byId(occupantId),
+        queryKey: queryKeys.users.byId(userId),
       });
     },
   });
 
   const checkOutUserMutation = useMutation({
-    mutationFn: (occupantId: string) => api.room.checkOutUser(occupantId),
-    onSuccess: (_, occupantId) => {
+    mutationFn: (userId: string) => api.room.checkOutUser(userId),
+    onSuccess: (_, userId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.users.byId(occupantId),
+        queryKey: queryKeys.users.byId(userId),
+      });
+    },
+  });
+
+  const scheduleCheckoutMutation = useMutation({
+    mutationFn: ({
+      userId,
+      checkoutTime,
+    }: {
+      userId: string;
+      checkoutTime: Date;
+    }) => api.room.scheduleCheckout(userId, checkoutTime),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.users.byId(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.userResidenceSessions.byUserId(userId),
       });
     },
   });
@@ -71,9 +90,11 @@ export function useRooms() {
     deleteRoom: deleteRoomMutation.mutateAsync,
     checkInUser: checkInUserMutation.mutateAsync,
     checkOutUser: checkOutUserMutation.mutateAsync,
+    scheduleCheckout: scheduleCheckoutMutation.mutateAsync,
     isAddingRoom: addRoomMutation.isPending,
     isDeletingRoom: deleteRoomMutation.isPending,
     isCheckingIn: checkInUserMutation.isPending,
     isCheckingOut: checkOutUserMutation.isPending,
+    isSchedulingCheckout: scheduleCheckoutMutation.isPending,
   };
 }

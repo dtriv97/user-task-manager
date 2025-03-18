@@ -37,7 +37,7 @@ export function useCheckInModal({
       setLoading(true);
       await rooms.checkInUser({
         roomNumber,
-        occupantId: user.userId,
+        userId: user.userId,
       });
       alert("User checked in successfully");
       navigate(0);

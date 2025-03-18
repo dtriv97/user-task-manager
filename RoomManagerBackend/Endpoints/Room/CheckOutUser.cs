@@ -9,7 +9,7 @@ public class CheckOutUser : ICustomEndpoint
 {
     public record CheckOutUserRequest
     {
-        public required Guid OccupantId { get; init; }
+        public required Guid UserId { get; init; }
         public required Guid RoomId { get; init; }
     }
 
@@ -35,7 +35,7 @@ public class CheckOutUser : ICustomEndpoint
     )
     {
         var user = await userResidenceService.EndUserResidenceSession(
-            request.OccupantId,
+            request.UserId,
             request.RoomId
         );
 
