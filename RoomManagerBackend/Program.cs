@@ -52,6 +52,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
+    app.UseDefaultFiles();
     app.UseStaticFiles(
         new StaticFileOptions
         {
@@ -65,9 +66,6 @@ else
 
 app.AddEndpoints();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.MapFallbackToFile("index.html");
-}
+app.MapFallbackToFile("index.html");
 
 app.Run();
