@@ -67,6 +67,6 @@ _ReSharper*/
 *.db-shm
 
 # Docker
-**/[Dd]ockerfile
 **/docker-compose*
-TaskManager/tasks.db
+
+RoomManagerBackend/tasks.db

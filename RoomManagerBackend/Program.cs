@@ -40,13 +40,25 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    // Enable CORS
     app.UseCors();
 }
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles(
+    new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "frontend")
+        ),
+        RequestPath = "",
+    }
+);
+
+// Add endpoints
 app.AddEndpoints();
+
+// Handle SPA routing
+app.MapFallbackToFile("index.html");
 
 app.Run();

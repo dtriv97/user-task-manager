@@ -56,7 +56,6 @@ api.interceptors.response.use(
   }
 );
 
-// Room API endpoints
 export const roomApi = {
   getAllRooms: async (): Promise<Room[]> => {
     try {
@@ -86,24 +85,31 @@ export const roomApi = {
     return response.data;
   },
 
-  checkInUser: async (
-    roomNumber: number,
-    occupantId: string
-  ): Promise<Room> => {
+  checkInUser: async (roomNumber: number, userId: string): Promise<Room> => {
     const response = await api.post("/room/checkInUser", {
       roomNumber,
-      occupantId,
+      userId,
     });
     return response.data;
   },
 
-  checkOutUser: async (occupantId: string): Promise<User> => {
-    const response = await api.post("/room/checkOutUser", { occupantId });
+  checkOutUser: async (userId: string): Promise<User> => {
+    const response = await api.post("/room/checkOutUser", { userId });
+    return response.data;
+  },
+
+  scheduleCheckout: async (
+    userId: string,
+    checkoutTime: Date
+  ): Promise<UserResidenceSession> => {
+    const response = await api.post("/room/scheduleUserCheckout", {
+      userId,
+      checkoutTime,
+    });
     return response.data;
   },
 };
 
-// User API endpoints
 export const userApi = {
   getAllUsers: async (): Promise<User[]> => {
     const response = await api.get("/user/getAllUsers");

@@ -9,7 +9,8 @@ import {
 } from "@mui/material";
 import { useUserResidenceSession } from "../services/useUserResidenceSessions";
 import { formatTime } from "../utils/formatTime";
-
+import ScheduleUserCheckoutModal from "./ScheduleUserCheckoutModal";
+import { useState } from "react";
 export interface UserResidenceStatusProps {
   userId: string;
 }
@@ -18,6 +19,8 @@ export default function UserResidenceStatus({
   userId,
 }: UserResidenceStatusProps) {
   const userResidenceSession = useUserResidenceSession(userId);
+  const [isScheduleCheckoutModalOpen, setIsScheduleCheckoutModalOpen] =
+    useState(false);
 
   if (
     userResidenceSession.error ||
@@ -56,16 +59,29 @@ export default function UserResidenceStatus({
                   : ""}
               </Typography>
               {userResidenceSession.data.scheduledCheckoutTime ? (
-                <Typography variant="body2">
-                  `Scheduled Check-Out: $
-                  {formatTime(userResidenceSession.data.scheduledCheckoutTime)}`
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                >
+                  {`Scheduled Check-Out: ${formatTime(
+                    userResidenceSession.data.scheduledCheckoutTime,
+                    true
+                  )}`}
                 </Typography>
               ) : (
-                ""
+                <Button onClick={() => setIsScheduleCheckoutModalOpen(true)}>
+                  Schedule Checkout
+                </Button>
               )}
             </Box>
             <Button color="error">Check Out</Button>
           </Box>
+          <ScheduleUserCheckoutModal
+            isOpen={isScheduleCheckoutModalOpen}
+            onClose={() => setIsScheduleCheckoutModalOpen(false)}
+            checkInTime={new Date(userResidenceSession.data.checkInTime)}
+            userId={userId}
+          />
         </>
       )}
     </>
