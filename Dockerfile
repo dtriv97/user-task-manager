@@ -26,11 +26,11 @@ COPY --from=backend-build /app/publish ./backend
 COPY --from=frontend-build /app/frontend/build ./frontend
 
 # Set environment variables
-ENV ASPNETCORE_URLS=http://+:80
+ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 # Expose port
-EXPOSE 80
+EXPOSE 8080
 
 # Start the backend application
 ENTRYPOINT ["dotnet", "backend/RoomManagerBackend.dll"] 

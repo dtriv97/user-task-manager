@@ -5,11 +5,9 @@ using RoomManagerBackend.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Builder API Setup
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure JSON serialization to handle circular references
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.ReferenceHandler = System
@@ -20,15 +18,23 @@ builder.Services.ConfigureHttpJsonOptions(options =>
         .IgnoreCycles;
 });
 
-// Database Setup
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=tasks.db"));
 
-// Add CORS configuration
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        }
+        else
+        {
+            policy
+                .WithOrigins(builder.Configuration.GetValue<string>("APP_URL_ORIGIN")!)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
     });
 });
 
@@ -36,29 +42,32 @@ builder.Services.AddScoped<IUserResidenceService, UserResidenceService>();
 
 var app = builder.Build();
 
+app.UseCors();
+app.UseHttpsRedirection();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseCors();
+}
+else
+{
+    app.UseStaticFiles(
+        new StaticFileOptions
+        {
+            FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+                Path.Combine(Directory.GetCurrentDirectory(), "frontend")
+            ),
+            RequestPath = "",
+        }
+    );
 }
 
-app.UseHttpsRedirection();
-
-app.UseStaticFiles(
-    new StaticFileOptions
-    {
-        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-            Path.Combine(Directory.GetCurrentDirectory(), "frontend")
-        ),
-        RequestPath = "",
-    }
-);
-
-// Add endpoints
 app.AddEndpoints();
 
-// Handle SPA routing
-app.MapFallbackToFile("index.html");
+if (!app.Environment.IsDevelopment())
+{
+    app.MapFallbackToFile("index.html");
+}
 
 app.Run();
