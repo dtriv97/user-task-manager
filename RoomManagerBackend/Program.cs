@@ -43,7 +43,6 @@ builder.Services.AddScoped<IUserResidenceService, UserResidenceService>();
 var app = builder.Build();
 
 app.UseCors();
-app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
 {
@@ -52,20 +51,16 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
+    // Serve static files first
+    app.UseStaticFiles();
+
+    // Then serve default files
     app.UseDefaultFiles();
-    app.UseStaticFiles(
-        new StaticFileOptions
-        {
-            FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-                Path.Combine(Directory.GetCurrentDirectory(), "frontend")
-            ),
-            RequestPath = "",
-        }
-    );
+
+    // Finally, map fallback to index.html
+    app.MapFallbackToFile("index.html");
 }
 
 app.AddEndpoints();
-
-app.MapFallbackToFile("index.html");
 
 app.Run();
