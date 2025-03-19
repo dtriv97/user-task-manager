@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  Modal,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Dialog, Typography } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
@@ -26,7 +19,7 @@ export default function ScheduleUserCheckoutModal({
   userResidenceSession,
 }: ScheduleUserCheckoutModalProps) {
   const [checkoutTime, setCheckoutTime] = useState<Dayjs | null>();
-  const { scheduleCheckout, isSchedulingCheckout } = useRooms();
+  const { scheduleCheckout } = useRooms();
 
   useEffect(() => {
     if (userResidenceSession.scheduledCheckoutTime !== null) {

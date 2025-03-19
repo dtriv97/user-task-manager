@@ -1,7 +1,12 @@
 import axios, { AxiosError } from "axios";
 import { Room, User, UserResidenceSession } from "../types/models";
 
-const API_BASE_URL = "http://localhost:5220/api";
+const APP_ORIGIN_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:5220"
+    : process.env.API_ORIGIN_URL;
+
+const API_BASE_URL = `${APP_ORIGIN_URL}/api`;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -160,8 +165,10 @@ export const userResidenceSessionApi = {
   },
 };
 
-export default {
+const apis = {
   room: roomApi,
   user: userApi,
   userResidenceSession: userResidenceSessionApi,
 };
+
+export default apis;

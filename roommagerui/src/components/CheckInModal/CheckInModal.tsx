@@ -1,5 +1,12 @@
 import React from "react";
-import { Dialog, DialogTitle, CircularProgress } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  CircularProgress,
+  Box,
+  Typography,
+  DialogContent,
+} from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserSelectDialogTable from "./UserSelectDialogTable";
@@ -72,31 +79,78 @@ export function useCheckInModal({
       <Dialog
         open={open}
         onClose={handleClose}
+        maxWidth="md"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: 2,
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
+              minHeight: "60vh",
+              maxHeight: "80vh",
+            },
+          },
+        }}
       >
-        <DialogTitle variant="h4">Check-in users</DialogTitle>
-        {loading && <CircularProgress />}
-        {!loading && (
-          <UserSelectDialogTable
-            users={users.users}
-            handleCancel={handleClose}
-            handleCheckIn={(user) => {
-              if (user.room !== null) {
-                setConfirmModalProps({
-                  title: `${user.firstName} ${user.lastName} already checked into Room ${user.room?.roomNumber}`,
-                  message: `Would you like to check them out and into Room ${roomNumber}?`,
-                  onConfirm: () => {
-                    handleCheckIn(user);
-                  },
-                  onCancel: () => {
-                    setConfirmModalProps(null);
-                  },
-                });
-              } else {
-                handleCheckIn(user);
-              }
+        <Box sx={{ p: 3 }}>
+          <DialogTitle
+            sx={{
+              pb: 3,
+              borderBottom: "1px solid",
             }}
-          />
-        )}
+          >
+            <Typography variant="h4">Check-in Users</Typography>
+          </DialogTitle>
+          {loading && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "200px",
+              }}
+            >
+              <CircularProgress size={40} />
+            </Box>
+          )}
+          {!loading && (
+            <DialogContent>
+              <Typography
+                variant="body1"
+                sx={{
+                  mb: 3,
+                  color: "text.secondary",
+                  fontSize: "1rem",
+                  lineHeight: 1.5,
+                }}
+              >
+                Select a user to check into Room {roomNumber}
+              </Typography>
+              <UserSelectDialogTable
+                users={users.users.filter(
+                  (user) => user.room?.roomNumber !== roomNumber
+                )}
+                handleCancel={handleClose}
+                handleCheckIn={(user) => {
+                  if (user.room !== null) {
+                    setConfirmModalProps({
+                      title: `${user.firstName} ${user.lastName} already checked into Room ${user.room?.roomNumber}`,
+                      message: `Would you like to check them out and into Room ${roomNumber}?`,
+                      onConfirm: () => {
+                        handleCheckIn(user);
+                      },
+                      onCancel: () => {
+                        setConfirmModalProps(null);
+                      },
+                    });
+                  } else {
+                    handleCheckIn(user);
+                  }
+                }}
+              />
+            </DialogContent>
+          )}
+        </Box>
       </Dialog>
       {confirmModalProps !== null && <ConfirmModal {...confirmModalProps} />}
     </>

@@ -1,11 +1,9 @@
 import {
   Box,
   Button,
-  ButtonGroup,
   Card,
   CircularProgress,
   Divider,
-  Link,
   Typography,
 } from "@mui/material";
 import { useUserResidenceSession } from "../services/useUserResidenceSessions";
