@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUsers } from "../services/useUsers";
+import { toast } from "react-toast";
 
 export default function AddUser() {
   const users = useUsers();
@@ -25,7 +26,7 @@ export default function AddUser() {
       var userSuccess = await users.addUser({ ...userData });
       navigate(`/user/${userSuccess.userId}`);
     } catch (error) {
-      alert("Failed to add user. Please try again.");
+      toast.error("Failed to add user. Please try again.");
     } finally {
       setIsLoading(false);
     }

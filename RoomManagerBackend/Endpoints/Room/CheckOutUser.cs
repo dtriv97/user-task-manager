@@ -44,6 +44,15 @@ public class CheckOutUser : ICustomEndpoint
             return TypedResults.NotFound();
         }
 
+        var room = await dbContext.Rooms.FirstOrDefaultAsync(r => r.Id == request.RoomId);
+
+        if (room != null && room.Occupants.Contains(user))
+        {
+            room.Occupants.Remove(user);
+        }
+
+        await dbContext.SaveChangesAsync();
+
         return TypedResults.Ok(user);
     }
 }

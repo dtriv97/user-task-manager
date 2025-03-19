@@ -4,18 +4,14 @@ import {
   Card,
   Container,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
   CircularProgress,
-  Divider,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
-import { formatTime } from "../utils/formatTime";
 import { useCheckInModal } from "../components/CheckInModal/CheckInModal";
 import { useRooms } from "../services/useRooms";
 import { Group } from "@mui/icons-material";
 import UserResidenceStatus from "../components/UserResidenceStatus";
+import { toast } from "react-toast";
 
 export default function Room() {
   const { roomNumber } = useParams();
@@ -73,10 +69,10 @@ export default function Room() {
 
   const handleCheckOut = async (userId: string) => {
     try {
-      await rooms.checkOutUser(userId);
+      await rooms.checkOutUser({ roomId: room.id, userId });
       navigate(0);
     } catch (error) {
-      console.error("Failed to check out user:", error);
+      toast.error("Failed to check out user. Please try again.");
     }
   };
 
@@ -93,26 +89,28 @@ export default function Room() {
             {`${room.occupants.length} / ${room.maxOccupancy}`}
           </Box>
         </Typography>
-
-        <List>
-          {room.occupants?.length === 0 ? (
-            <ListItem>
-              <ListItemText primary="No current occupants" />
-            </ListItem>
-          ) : (
-            room.occupants.map((occupant) => {
-              return (
-                <ListItem
-                  key={occupant.userId}
-                  style={{ width: "100%" }}
-                >
-                  <UserResidenceStatus userId={occupant.userId} />
-                </ListItem>
-              );
-            })
-          )}
-        </List>
       </Card>
+
+      <Box
+        sx={{
+          mt: 2,
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 2,
+          flexDirection: "row",
+        }}
+      >
+        {room.occupants?.length > 0 &&
+          room.occupants.map((user) => {
+            return (
+              <UserResidenceStatus
+                userId={user.userId}
+                checkOutFn={handleCheckOut}
+                key={user.userId}
+              />
+            );
+          })}
+      </Box>
 
       <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}>
         {isCheckInLoading ? (

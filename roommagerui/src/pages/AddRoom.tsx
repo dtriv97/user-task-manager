@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useRooms } from "../services/useRooms";
+import { toast } from "react-toast";
 
 export default function AddRoom() {
   const rooms = useRooms();
@@ -25,7 +26,7 @@ export default function AddRoom() {
       var addedRoom = await rooms.addRoom({ ...roomData });
       navigate(`/room/${addedRoom.roomNumber}`);
     } catch (error) {
-      alert("Failed to add room. Please try again.");
+      toast.error("Failed to add room. Please try again.");
     } finally {
       setIsLoading(false);
     }

@@ -11,35 +11,39 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { useRooms } from "../services/useRooms";
+import { UserResidenceSession } from "../types/models";
+import { toast } from "react-toast";
 
 interface ScheduleUserCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  checkInTime: Date;
-  userId: string;
+  userResidenceSession: UserResidenceSession;
 }
 
 export default function ScheduleUserCheckoutModal({
   isOpen,
   onClose,
-  checkInTime,
-  userId,
+  userResidenceSession,
 }: ScheduleUserCheckoutModalProps) {
   const [checkoutTime, setCheckoutTime] = useState<Dayjs | null>();
   const { scheduleCheckout, isSchedulingCheckout } = useRooms();
 
   useEffect(() => {
-    setCheckoutTime(dayjs(checkInTime).add(2, "day"));
-  }, [checkInTime]);
+    if (userResidenceSession.scheduledCheckoutTime !== null) {
+      setCheckoutTime(dayjs(userResidenceSession.scheduledCheckoutTime));
+    } else {
+      setCheckoutTime(dayjs(userResidenceSession.checkInTime).add(2, "day"));
+    }
+  }, [userResidenceSession]);
 
   const handleScheduleCheckout = () => {
     try {
       scheduleCheckout({
-        userId: userId,
+        userId: userResidenceSession.user.userId,
         checkoutTime: checkoutTime?.toDate() ?? new Date(),
       });
     } catch (e) {
-      alert("Failed to schedule checkout. Please try again.");
+      toast.error("Failed to schedule checkout. Please try again.");
     } finally {
       onClose();
     }
@@ -66,7 +70,7 @@ export default function ScheduleUserCheckoutModal({
           <DateTimePicker
             disablePast
             label="Checkout Time"
-            defaultValue={dayjs(checkInTime).add(2, "day")}
+            defaultValue={dayjs(userResidenceSession.checkInTime).add(2, "day")}
             value={checkoutTime}
             onChange={(value) => setCheckoutTime(value)}
           />
@@ -75,7 +79,7 @@ export default function ScheduleUserCheckoutModal({
             align="center"
           >
             {`User total stay time is ${dayjs(checkoutTime).diff(
-              checkInTime,
+              userResidenceSession.checkInTime,
               "day"
             )} days`}
           </Typography>

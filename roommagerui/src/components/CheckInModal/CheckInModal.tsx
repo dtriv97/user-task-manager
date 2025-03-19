@@ -1,5 +1,5 @@
 import React from "react";
-import { Dialog, DialogTitle, CircularProgress, Alert } from "@mui/material";
+import { Dialog, DialogTitle, CircularProgress } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserSelectDialogTable from "./UserSelectDialogTable";
@@ -7,6 +7,7 @@ import { User } from "../../types/models";
 import ConfirmModal, { ConfirmModalProps } from "../ConfirmModal";
 import { useUsers } from "../../services/useUsers";
 import { useRooms } from "../../services/useRooms";
+import { toast } from "react-toast";
 
 interface CheckInModalReturn {
   isLoading: boolean;
@@ -39,10 +40,10 @@ export function useCheckInModal({
         roomNumber,
         userId: user.userId,
       });
-      alert("User checked in successfully");
+      toast.success("User checked in successfully");
       navigate(0);
     } catch (error) {
-      alert("Failed to check in user. Please try again.");
+      toast.error("Failed to check in user. Please try again.");
     } finally {
       setLoading(false);
       handleClose();
@@ -50,7 +51,7 @@ export function useCheckInModal({
   };
 
   if (users.error || rooms.error) {
-    alert("Failed to load users or rooms. Please try again.");
+    toast.error("Failed to load users or rooms. Please try again.");
     return {
       isLoading: false,
       openModal: () => {},

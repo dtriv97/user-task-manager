@@ -93,8 +93,8 @@ export const roomApi = {
     return response.data;
   },
 
-  checkOutUser: async (userId: string): Promise<User> => {
-    const response = await api.post("/room/checkOutUser", { userId });
+  checkOutUser: async (roomId: string, userId: string): Promise<User> => {
+    const response = await api.post("/room/checkOutUser", { roomId, userId });
     return response.data;
   },
 
@@ -105,6 +105,19 @@ export const roomApi = {
     const response = await api.post("/room/scheduleUserCheckout", {
       userId,
       checkoutTime,
+    });
+    return response.data;
+  },
+
+  updateScheduledCheckout: async (
+    userId: string,
+    roomId: string,
+    updatedCheckout: Date
+  ): Promise<UserResidenceSession> => {
+    const response = await api.post("/room/updateScheduledUserCheckout", {
+      userId,
+      roomId,
+      updatedCheckout,
     });
     return response.data;
   },

@@ -19,6 +19,7 @@ public static class AutoEndpointMapping
             .MapEndpoint<CheckInUser>()
             .MapEndpoint<CheckOutUser>()
             .MapEndpoint<ScheduleUserCheckout>()
+            .MapEndpoint<UpdateScheduledUserCheckout>()
             .MapEndpoint<GetAllRooms>();
 
         baseGroup

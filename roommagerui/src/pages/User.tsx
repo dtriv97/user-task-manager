@@ -10,6 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import ConfirmModal from "../components/ConfirmModal";
 import { useUsers } from "../services/useUsers";
+import { toast } from "react-toast";
 
 export default function User() {
   const { userId } = useParams();
@@ -48,10 +49,10 @@ export default function User() {
     try {
       setIsDeleting(true);
       await users.deleteUser(user.userId);
-      alert("User deleted successfully");
+      toast.success("User deleted successfully");
       navigate("/");
     } catch (error) {
-      alert("Failed to delete user. Please try again.");
+      toast.error("Failed to delete user. Please try again.");
     } finally {
       setIsDeleting(false);
     }
