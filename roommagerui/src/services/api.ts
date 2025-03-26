@@ -1,12 +1,8 @@
 import axios, { AxiosError } from "axios";
 import { Room, User, UserResidenceSession } from "../types/models";
 
-const APP_ORIGIN_URL =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:5220"
-    : process.env.API_ORIGIN_URL;
-
-const API_BASE_URL = `${APP_ORIGIN_URL}/api`;
+const API_BASE_URL =
+  process.env.NODE_ENV === "development" ? "http://localhost:5220/api" : "/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
