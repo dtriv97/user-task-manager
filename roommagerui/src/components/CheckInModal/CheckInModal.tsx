@@ -10,75 +10,51 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserSelectDialogTable from "./UserSelectDialogTable";
-import { User } from "../../types/models";
-import ConfirmModal, { ConfirmModalProps } from "../ConfirmModal";
+import { Room, User } from "../../types/models";
 import { useUsers } from "../../services/useUsers";
 import { useRooms } from "../../services/useRooms";
 import { toast } from "react-toast";
 
-interface CheckInModalReturn {
-  isLoading: boolean;
-  openModal: () => void;
-  CheckInDialog: (props: CheckInModalProps) => React.ReactElement | null;
-}
-
 interface CheckInModalProps {
-  roomNumber: number;
+  room: Room;
+  onClose: () => void;
 }
 
-export function useCheckInModal({
-  roomNumber,
-}: CheckInModalProps): CheckInModalReturn {
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+export default function CheckInModal({ room, onClose }: CheckInModalProps) {
+  const { checkInUser } = useRooms();
   const [loading, setLoading] = useState(false);
-  const [confirmModalProps, setConfirmModalProps] =
-    useState<ConfirmModalProps | null>(null);
   const users = useUsers();
-  const rooms = useRooms();
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleCheckIn = async (users: User[]) => {
+    if (users.length > room.maxOccupancy - room.occupants?.length) {
+      toast.error("Cannot check in more users than the room can hold.");
+      return;
+    }
 
-  const handleCheckIn = async (user: User) => {
     try {
       setLoading(true);
-      await rooms.checkInUser({
-        roomNumber,
-        userId: user.userId,
-      });
-      toast.success("User checked in successfully");
-      navigate(0);
+      await Promise.all(
+        users.map((user) =>
+          checkInUser({
+            roomNumber: room.roomNumber,
+            userId: user.userId,
+          })
+        )
+      );
+      toast.success("All users checked in successfully");
+      onClose();
     } catch (error) {
-      toast.error("Failed to check in user. Please try again.");
+      toast.error("Failed to check in all users. Please try again.");
     } finally {
       setLoading(false);
-      handleClose();
     }
   };
 
-  if (users.error || rooms.error) {
-    toast.error("Failed to load users or rooms. Please try again.");
-    return {
-      isLoading: false,
-      openModal: () => {},
-      CheckInDialog: () => null,
-    };
-  }
-
-  if (users.isLoading || rooms.isLoading) {
-    return {
-      isLoading: true,
-      openModal: () => {},
-      CheckInDialog: () => null,
-    };
-  }
-
-  const CheckInDialog = () => (
+  return (
     <>
       <Dialog
-        open={open}
-        onClose={handleClose}
+        open={true}
+        onClose={onClose}
         maxWidth="md"
         fullWidth
         slotProps={{
@@ -86,13 +62,18 @@ export function useCheckInModal({
             sx: {
               borderRadius: 2,
               boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
-              minHeight: "60vh",
-              maxHeight: "80vh",
             },
           },
         }}
       >
-        <Box sx={{ p: 3 }}>
+        <Box
+          sx={{
+            p: 3,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <DialogTitle
             sx={{
               pb: 3,
@@ -114,7 +95,7 @@ export function useCheckInModal({
             </Box>
           )}
           {!loading && (
-            <DialogContent>
+            <DialogContent sx={{ paddingTop: "inherit !important" }}>
               <Typography
                 variant="body1"
                 sx={{
@@ -124,41 +105,21 @@ export function useCheckInModal({
                   lineHeight: 1.5,
                 }}
               >
-                Select a user to check into Room {roomNumber}
+                Select user(s) to check into Room {room.roomNumber}
               </Typography>
-              <UserSelectDialogTable
-                users={users.users.filter(
-                  (user) => user.room?.roomNumber !== roomNumber
-                )}
-                handleCancel={handleClose}
-                handleCheckIn={(user) => {
-                  if (user.room !== null) {
-                    setConfirmModalProps({
-                      title: `${user.firstName} ${user.lastName} already checked into Room ${user.room?.roomNumber}`,
-                      message: `Would you like to check them out and into Room ${roomNumber}?`,
-                      onConfirm: () => {
-                        handleCheckIn(user);
-                      },
-                      onCancel: () => {
-                        setConfirmModalProps(null);
-                      },
-                    });
-                  } else {
-                    handleCheckIn(user);
-                  }
-                }}
-              />
+              {users.error ? (
+                <Typography>Failed to load users. Please try again.</Typography>
+              ) : (
+                <UserSelectDialogTable
+                  users={users.users.filter((user) => user.room === null)}
+                  handleCancel={onClose}
+                  handleCheckIn={handleCheckIn}
+                />
+              )}
             </DialogContent>
           )}
         </Box>
       </Dialog>
-      {confirmModalProps !== null && <ConfirmModal {...confirmModalProps} />}
     </>
   );
-
-  return {
-    isLoading: false,
-    openModal: handleOpen,
-    CheckInDialog,
-  };
 }

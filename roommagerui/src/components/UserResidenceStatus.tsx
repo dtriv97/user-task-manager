@@ -84,12 +84,16 @@ export default function UserResidenceStatus({
                   variant="outlined"
                   onClick={() => setIsScheduleCheckoutModalOpen(true)}
                   size="small"
+                  disableTouchRipple
+                  disableRipple
                 >
                   {userResidenceSession.data.scheduledCheckoutTime
                     ? "Update"
                     : "Schedule Checkout"}
                 </Button>
                 <Button
+                  disableTouchRipple
+                  disableRipple
                   fullWidth
                   sx={{
                     backgroundColor: "rgba(223, 13, 76, 0.75)",

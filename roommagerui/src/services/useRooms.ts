@@ -43,9 +43,9 @@ export function useRooms() {
       roomNumber: number;
       userId: string;
     }) => api.room.checkInUser(roomNumber, userId),
-    onSuccess: (_, { roomNumber, userId }) => {
+    onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.rooms.byNumber(roomNumber),
+        queryKey: queryKeys.rooms.all,
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.users.byId(userId),
