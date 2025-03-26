@@ -4,31 +4,22 @@ import {
   Card,
   Container,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
   CircularProgress,
-  Divider,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
-import { formatTime } from "../utils/formatTime";
-import { useCheckInModal } from "../components/CheckInModal/CheckInModal";
 import { useRooms } from "../services/useRooms";
 import { Group } from "@mui/icons-material";
 import UserResidenceStatus from "../components/UserResidenceStatus";
+import { toast } from "react-toast";
+import CheckInModal from "../components/CheckInModal/CheckInModal";
+import { useState } from "react";
 
 export default function Room() {
   const { roomNumber } = useParams();
-  const rooms = useRooms();
+  const { rooms, isLoading, error, checkOutUser } = useRooms();
+  const [showCheckIn, setShowCheckIn] = useState(false);
 
-  const navigate = useNavigate();
-  const {
-    openModal: openCheckInModal,
-    CheckInDialog,
-    isLoading: isCheckInLoading,
-  } = useCheckInModal({ roomNumber: parseInt(roomNumber || "0") });
-
-  if (rooms.isLoading) {
+  if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
         <CircularProgress />
@@ -36,7 +27,7 @@ export default function Room() {
     );
   }
 
-  if (rooms.error) {
+  if (error) {
     return (
       <Container>
         <Card sx={{ p: 2, mt: 2 }}>
@@ -51,9 +42,7 @@ export default function Room() {
     );
   }
 
-  const room = rooms.rooms.find(
-    (r) => r.roomNumber === parseInt(roomNumber || "0")
-  );
+  const room = rooms.find((r) => r.roomNumber === parseInt(roomNumber || "0"));
 
   if (!room) {
     return (
@@ -67,16 +56,12 @@ export default function Room() {
     );
   }
 
-  const handleCheckIn = () => {
-    openCheckInModal();
-  };
-
   const handleCheckOut = async (userId: string) => {
     try {
-      await rooms.checkOutUser(userId);
-      navigate(0);
+      await checkOutUser({ roomId: room.id, userId });
+      toast.success("User checked out successfully");
     } catch (error) {
-      console.error("Failed to check out user:", error);
+      toast.error("Failed to check out user. Please try again.");
     }
   };
 
@@ -93,43 +78,46 @@ export default function Room() {
             {`${room.occupants.length} / ${room.maxOccupancy}`}
           </Box>
         </Typography>
-
-        <List>
-          {room.occupants?.length === 0 ? (
-            <ListItem>
-              <ListItemText primary="No current occupants" />
-            </ListItem>
-          ) : (
-            room.occupants.map((occupant) => {
-              return (
-                <ListItem
-                  key={occupant.userId}
-                  style={{ width: "100%" }}
-                >
-                  <UserResidenceStatus userId={occupant.userId} />
-                </ListItem>
-              );
-            })
-          )}
-        </List>
       </Card>
 
-      <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}>
-        {isCheckInLoading ? (
-          <CircularProgress />
-        ) : (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCheckIn}
-            disabled={room.occupants.length >= room.maxOccupancy}
-          >
-            Check In New User
-          </Button>
-        )}
+      <Box
+        sx={{
+          mt: 2,
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 2,
+          flexDirection: "row",
+        }}
+      >
+        {room.occupants?.length > 0 &&
+          room.occupants.map((user) => {
+            return (
+              <UserResidenceStatus
+                userId={user.userId}
+                checkOutFn={handleCheckOut}
+                key={user.userId}
+              />
+            );
+          })}
       </Box>
 
-      <CheckInDialog roomNumber={room.roomNumber} />
+      <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 2 }}>
+        <Button
+          disableRipple
+          variant="contained"
+          color="primary"
+          onClick={() => setShowCheckIn(true)}
+          disabled={room.occupants.length >= room.maxOccupancy}
+        >
+          Check In New User
+        </Button>
+      </Box>
+      {showCheckIn && (
+        <CheckInModal
+          room={room}
+          onClose={() => setShowCheckIn(false)}
+        />
+      )}
     </Container>
   );
 }

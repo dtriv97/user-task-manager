@@ -7,4 +7,5 @@ public interface IUserResidenceService
     Task<UserResidenceSession> GetUserResidenceSession(Guid userId);
     Task<User> EndUserResidenceSession(Guid userId, Guid roomId);
     Task<Room> StartUserResidenceSession(Guid userId, Guid roomId);
+    Task UpdateUserResidenceSession(Guid userId, Guid roomId, DateTime updatedCheckout);
 }

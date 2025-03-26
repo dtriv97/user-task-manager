@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import api, { queryKeys } from "../services/api";
 
 export function useUserResidenceSession(userId: string) {
@@ -9,8 +9,6 @@ export function useUserResidenceSession(userId: string) {
 }
 
 export function useUserResidenceSessions() {
-  const queryClient = useQueryClient();
-
   const {
     data: userResidenceSessions = [],
     isLoading,

@@ -43,9 +43,9 @@ export function useRooms() {
       roomNumber: number;
       userId: string;
     }) => api.room.checkInUser(roomNumber, userId),
-    onSuccess: (_, { roomNumber, userId }) => {
+    onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.rooms.byNumber(roomNumber),
+        queryKey: queryKeys.rooms.all,
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.users.byId(userId),
@@ -54,8 +54,9 @@ export function useRooms() {
   });
 
   const checkOutUserMutation = useMutation({
-    mutationFn: (userId: string) => api.room.checkOutUser(userId),
-    onSuccess: (_, userId) => {
+    mutationFn: ({ roomId, userId }: { roomId: string; userId: string }) =>
+      api.room.checkOutUser(roomId, userId),
+    onSuccess: (_, { roomId, userId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all });
       queryClient.invalidateQueries({
         queryKey: queryKeys.users.byId(userId),
@@ -82,6 +83,24 @@ export function useRooms() {
     },
   });
 
+  const updateScheduledCheckoutMutation = useMutation({
+    mutationFn: ({
+      userId,
+      roomId,
+      updatedCheckout,
+    }: {
+      userId: string;
+      roomId: string;
+      updatedCheckout: Date;
+    }) => api.room.updateScheduledCheckout(userId, roomId, updatedCheckout),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.rooms.all });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.userResidenceSessions.byUserId(userId),
+      });
+    },
+  });
+
   return {
     rooms,
     isLoading,
@@ -91,10 +110,12 @@ export function useRooms() {
     checkInUser: checkInUserMutation.mutateAsync,
     checkOutUser: checkOutUserMutation.mutateAsync,
     scheduleCheckout: scheduleCheckoutMutation.mutateAsync,
+    updateScheduledCheckout: updateScheduledCheckoutMutation.mutateAsync,
     isAddingRoom: addRoomMutation.isPending,
     isDeletingRoom: deleteRoomMutation.isPending,
     isCheckingIn: checkInUserMutation.isPending,
     isCheckingOut: checkOutUserMutation.isPending,
     isSchedulingCheckout: scheduleCheckoutMutation.isPending,
+    isUpdatingScheduledCheckout: updateScheduledCheckoutMutation.isPending,
   };
 }

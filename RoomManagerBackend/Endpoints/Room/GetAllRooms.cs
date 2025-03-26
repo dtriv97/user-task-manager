@@ -21,7 +21,11 @@ public class GetAllRooms : ICustomEndpoint
 
     private static async Task<IResult> Handle(AppDbContext dbContext)
     {
-        var rooms = await dbContext.Rooms.Include(r => r.Occupants).ToListAsync();
+        var rooms = await dbContext
+            .Rooms.Include(r => r.Occupants)
+            .OrderBy(r => r.RoomNumber)
+            .ToListAsync();
+
         return Results.Ok(rooms);
     }
 }

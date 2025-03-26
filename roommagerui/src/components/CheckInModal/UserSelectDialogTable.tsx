@@ -1,15 +1,13 @@
 import {
   DialogContent,
   Table,
-  TableHead,
   TableRow,
   TableCell,
   TableBody,
   DialogActions,
   Button,
   Typography,
-  Container,
-  Chip,
+  Box,
 } from "@mui/material";
 import { useState } from "react";
 import { User } from "../../types/models";
@@ -17,7 +15,7 @@ import { User } from "../../types/models";
 export interface UsersTableProps {
   users: User[];
   handleCancel: () => void;
-  handleCheckIn: (user: User) => void;
+  handleCheckIn: (users: User[]) => void;
 }
 
 export default function UserSelectDialogTable({
@@ -25,70 +23,76 @@ export default function UserSelectDialogTable({
   handleCancel,
   handleCheckIn,
 }: UsersTableProps) {
-  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   return (
-    <>
-      <DialogContent>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}
+    >
+      <DialogContent sx={{ padding: 0, flex: 1 }}>
         <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-            </TableRow>
-          </TableHead>
           <TableBody>
             {users.map((user) => (
               <TableRow
                 key={user.userId}
-                onClick={() => setSelectedUserId(user.userId)}
+                onClick={() => {
+                  if (selectedUsers.includes(user.userId)) {
+                    setSelectedUsers(
+                      selectedUsers.filter((id) => id !== user.userId)
+                    );
+                  } else {
+                    setSelectedUsers([...selectedUsers, user.userId]);
+                  }
+                }}
                 sx={{
-                  transition: "background-color 0.2s ease",
+                  transition: "background-color 0.1s ease-out",
                   "&:hover": {
                     cursor: "pointer",
                     backgroundColor: "rgba(0, 0, 0, 0.04)",
                   },
-                  backgroundColor:
-                    selectedUserId === user.userId
-                      ? "rgba(25, 118, 210, 0.08)"
-                      : "transparent",
+                  backgroundColor: selectedUsers.includes(user.userId)
+                    ? "rgba(25, 118, 210, 0.08)"
+                    : "transparent",
                 }}
               >
-                <TableCell sx={{ paddingLeft: 0 }}>
-                  <Container
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      gap: 2,
-                      paddingLeft: 0,
-                    }}
-                  >
-                    <Typography>
-                      {user.firstName} {user.lastName}
-                    </Typography>
-                    {user.room !== null && (
-                      <Chip label={`Room ${user.room?.roomNumber}`} />
-                    )}
-                  </Container>
+                <TableCell>
+                  <Typography>
+                    {user.firstName} {user.lastName}
+                  </Typography>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </DialogContent>
-      <DialogActions>
+      <DialogActions
+        sx={{
+          padding: 2,
+          justifyContent: "flex-end",
+          borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+        }}
+      >
         <Button onClick={handleCancel}>Cancel</Button>
         <Button
           variant="contained"
+          disabled={selectedUsers.length === 0}
           onClick={() => {
             handleCheckIn(
-              users.find((user) => user.userId === selectedUserId)!
+              users.filter((user) => selectedUsers.includes(user.userId))
             );
           }}
         >
-          Check In
+          Check In{" "}
+          {selectedUsers.length > 0 &&
+            `${selectedUsers.length} ${
+              selectedUsers.length === 1 ? "user" : "users"
+            }`}
         </Button>
       </DialogActions>
-    </>
+    </Box>
   );
 }

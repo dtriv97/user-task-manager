@@ -1,22 +1,24 @@
 import {
   Box,
   Button,
-  ButtonGroup,
+  Card,
   CircularProgress,
   Divider,
-  Link,
   Typography,
 } from "@mui/material";
 import { useUserResidenceSession } from "../services/useUserResidenceSessions";
 import { formatTime } from "../utils/formatTime";
 import ScheduleUserCheckoutModal from "./ScheduleUserCheckoutModal";
 import { useState } from "react";
+
 export interface UserResidenceStatusProps {
   userId: string;
+  checkOutFn: (userId: string) => void;
 }
 
 export default function UserResidenceStatus({
   userId,
+  checkOutFn,
 }: UserResidenceStatusProps) {
   const userResidenceSession = useUserResidenceSession(userId);
   const [isScheduleCheckoutModalOpen, setIsScheduleCheckoutModalOpen] =
@@ -28,9 +30,9 @@ export default function UserResidenceStatus({
     userResidenceSession.data.user == null
   ) {
     return (
-      <Box>
+      <Card>
         <Typography>Error loading user status</Typography>
-      </Box>
+      </Card>
     );
   }
 
@@ -40,47 +42,76 @@ export default function UserResidenceStatus({
         <CircularProgress />
       ) : (
         <>
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems="center"
-            width={"100%"}
-          >
-            <Box gap={2}>
-              <Typography variant="h4">
-                {`${userResidenceSession.data.user.firstName} ${userResidenceSession.data.user.lastName}`}
-              </Typography>
-              <Typography variant="body1">
-                {userResidenceSession.data?.checkInTime
-                  ? `Checked In: ${formatTime(
-                      userResidenceSession.data.checkInTime
-                    )}`
-                  : ""}
-              </Typography>
-              {userResidenceSession.data.scheduledCheckoutTime ? (
+          <Card sx={{ padding: 2, maxWidth: 300 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Box>
                 <Typography
-                  variant="body2"
-                  color="textSecondary"
+                  variant="h4"
+                  gutterBottom
                 >
-                  {`Scheduled Check-Out: ${formatTime(
-                    userResidenceSession.data.scheduledCheckoutTime,
-                    true
-                  )}`}
+                  {`${userResidenceSession.data.user.firstName} ${userResidenceSession.data.user.lastName}`}
                 </Typography>
-              ) : (
-                <Button onClick={() => setIsScheduleCheckoutModalOpen(true)}>
-                  Schedule Checkout
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                >
+                  {userResidenceSession.data?.checkInTime
+                    ? `Checked In: ${formatTime(
+                        userResidenceSession.data.checkInTime
+                      )}`
+                    : ""}
+                </Typography>
+                {userResidenceSession.data.scheduledCheckoutTime ? (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
+                    {`Scheduled Check-Out: ${formatTime(
+                      userResidenceSession.data.scheduledCheckoutTime,
+                      true
+                    )}`}
+                  </Typography>
+                ) : null}
+              </Box>
+              <Divider sx={{ my: 1 }} />
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
+                gap={2}
+              >
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => setIsScheduleCheckoutModalOpen(true)}
+                  size="small"
+                  disableTouchRipple
+                  disableRipple
+                >
+                  {userResidenceSession.data.scheduledCheckoutTime
+                    ? "Update"
+                    : "Schedule Checkout"}
                 </Button>
-              )}
+                <Button
+                  disableTouchRipple
+                  disableRipple
+                  fullWidth
+                  sx={{
+                    backgroundColor: "rgba(223, 13, 76, 0.75)",
+                    color: "white",
+                  }}
+                  variant="contained"
+                  size="small"
+                  onClick={() => checkOutFn(userId)}
+                >
+                  Check Out
+                </Button>
+              </Box>
             </Box>
-            <Button color="error">Check Out</Button>
-          </Box>
+          </Card>
           <ScheduleUserCheckoutModal
             isOpen={isScheduleCheckoutModalOpen}
             onClose={() => setIsScheduleCheckoutModalOpen(false)}
-            checkInTime={new Date(userResidenceSession.data.checkInTime)}
-            userId={userId}
+            userResidenceSession={userResidenceSession.data}
           />
         </>
       )}

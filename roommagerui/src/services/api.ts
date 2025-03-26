@@ -1,7 +1,12 @@
 import axios, { AxiosError } from "axios";
 import { Room, User, UserResidenceSession } from "../types/models";
 
-const API_BASE_URL = "http://localhost:5220/api";
+const APP_ORIGIN_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:5220"
+    : process.env.API_ORIGIN_URL;
+
+const API_BASE_URL = `${APP_ORIGIN_URL}/api`;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -93,8 +98,8 @@ export const roomApi = {
     return response.data;
   },
 
-  checkOutUser: async (userId: string): Promise<User> => {
-    const response = await api.post("/room/checkOutUser", { userId });
+  checkOutUser: async (roomId: string, userId: string): Promise<User> => {
+    const response = await api.post("/room/checkOutUser", { roomId, userId });
     return response.data;
   },
 
@@ -105,6 +110,19 @@ export const roomApi = {
     const response = await api.post("/room/scheduleUserCheckout", {
       userId,
       checkoutTime,
+    });
+    return response.data;
+  },
+
+  updateScheduledCheckout: async (
+    userId: string,
+    roomId: string,
+    updatedCheckout: Date
+  ): Promise<UserResidenceSession> => {
+    const response = await api.post("/room/updateScheduledUserCheckout", {
+      userId,
+      roomId,
+      updatedCheckout,
     });
     return response.data;
   },
@@ -147,8 +165,10 @@ export const userResidenceSessionApi = {
   },
 };
 
-export default {
+const apis = {
   room: roomApi,
   user: userApi,
   userResidenceSession: userResidenceSessionApi,
 };
+
+export default apis;

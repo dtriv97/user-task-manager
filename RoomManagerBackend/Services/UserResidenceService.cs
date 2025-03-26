@@ -15,13 +15,12 @@ public class UserResidenceService(AppDbContext dbContext) : IUserResidenceServic
 
     public async Task<User> EndUserResidenceSession(Guid userId, Guid roomId)
     {
-        var user = await _dbContext.Users.FindAsync(userId);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId);
 
-        var currentUserResidenceSession = await _dbContext
-            .UserResidenceSessions.Where(urs =>
+        var currentUserResidenceSession =
+            await _dbContext.UserResidenceSessions.FirstOrDefaultAsync(urs =>
                 urs.Room.Id == roomId && urs.User.UserId == userId && urs.CheckOutTime == null
-            )
-            .FirstOrDefaultAsync();
+            );
 
         if (currentUserResidenceSession == null || user == null)
         {
@@ -55,5 +54,23 @@ public class UserResidenceService(AppDbContext dbContext) : IUserResidenceServic
         await _dbContext.SaveChangesAsync();
 
         return room;
+    }
+
+    public async Task UpdateUserResidenceSession(Guid userId, Guid roomId, DateTime updatedCheckout)
+    {
+        var user =
+            await _dbContext.Users.FindAsync(userId) ?? throw new Exception("User not found");
+
+        var userResidenceSession =
+            await _dbContext
+                .UserResidenceSessions.Where(urs =>
+                    urs.Room.Id == roomId && urs.User.UserId == userId && urs.CheckOutTime == null
+                )
+                .FirstOrDefaultAsync() ?? throw new Exception("User residence session not found");
+
+        userResidenceSession.CheckOutTime = updatedCheckout;
+        await _dbContext.SaveChangesAsync();
+
+        return;
     }
 }

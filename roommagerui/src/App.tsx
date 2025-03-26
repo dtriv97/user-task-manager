@@ -10,6 +10,7 @@ import Room from "./pages/Room";
 import AddUser from "./pages/AddUser";
 import User from "./pages/User";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toast";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -59,6 +60,10 @@ function AppContent() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <ToastContainer
+        position="top-center"
+        delay={5000}
+      />
       <Container>
         <Router>
           <Navigation />
