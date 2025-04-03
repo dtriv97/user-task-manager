@@ -18,7 +18,18 @@ builder.Services.ConfigureHttpJsonOptions(options =>
         .IgnoreCycles;
 });
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=tasks.db"));
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        options.UseSqlite("Data Source=tasks.db");
+    }
+    else
+    {
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        options.UseNpgsql(connectionString);
+    }
+});
 
 builder.Services.AddCors(options =>
 {
@@ -43,6 +54,12 @@ builder.Services.AddScoped<IUserResidenceService, UserResidenceService>();
 var app = builder.Build();
 
 app.UseCors();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
 if (app.Environment.IsDevelopment())
 {
