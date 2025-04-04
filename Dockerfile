@@ -13,13 +13,21 @@ COPY RoomManagerBackend/RoomManagerBackend.csproj RoomManagerBackend/
 COPY RoomManagerBackend.sln ./
 RUN dotnet restore
 COPY RoomManagerBackend/ RoomManagerBackend/
+COPY RoomManagerBackend/Migrations/ RoomManagerBackend/Migrations/
 RUN dotnet publish -c Release -o /app/publish
 
-# Final stage
+# Run migrations in a separate SDK stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS migration
+WORKDIR /app
+COPY --from=backend-build /app/publish ./
+COPY RoomManagerBackend/Migrations/ RoomManagerBackend/Migrations/
+RUN dotnet ef database update  # Run migrations here
+
+# Final runtime stage (smaller, no EF tools)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
-# Copy backend files
+# Copy the published application (migrations already applied)
 COPY --from=backend-build /app/publish ./
 
 # Copy frontend build to wwwroot
@@ -32,5 +40,5 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 # Expose port
 EXPOSE 8080
 
-# Start the backend application
-ENTRYPOINT ["dotnet", "RoomManagerBackend.dll"] 
+# Start the application
+ENTRYPOINT ["dotnet", "RoomManagerBackend.dll"]
