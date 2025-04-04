@@ -19,6 +19,9 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
+# Install dotnet-ef tools (EF Core CLI)
+RUN dotnet tool install --global dotnet-ef
+
 # Copy backend files
 COPY --from=backend-build /app/publish ./
 
@@ -33,4 +36,4 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 EXPOSE 8080
 
 # Start the backend application
-ENTRYPOINT ["dotnet", "RoomManagerBackend.dll"] 
+ENTRYPOINT ["sh", "-c", "dotnet ef database update && exec dotnet RoomManagerBackend.dll"] 
