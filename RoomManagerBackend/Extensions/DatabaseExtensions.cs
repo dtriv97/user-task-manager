@@ -9,7 +9,8 @@ public static class DatabaseExtensions
 {
     public static async Task InitializeDatabaseAsync(
         this IServiceProvider serviceProvider,
-        ILogger logger
+        ILogger logger,
+        IWebHostEnvironment environment
     )
     {
         using var scope = serviceProvider.CreateScope();
@@ -35,12 +36,20 @@ public static class DatabaseExtensions
         {
             try
             {
-                await dbContext.Database.EnsureCreatedAsync();
-                await dbContext.Database.MigrateAsync();
+                if (environment.IsDevelopment())
+                {
+                    await dbContext.Database.EnsureCreatedAsync();
+                }
+                else
+                {
+                    logger.LogInformation("Applying database migrations...");
+                    await dbContext.Database.MigrateAsync();
+                    logger.LogInformation("Database migrations completed successfully");
+                }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An error occurred while initializing the database");
+                logger.LogError(ex, "Error^");
                 throw;
             }
         });
