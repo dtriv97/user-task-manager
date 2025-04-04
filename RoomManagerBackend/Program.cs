@@ -72,7 +72,7 @@ app.UseCors();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
-await app.Services.InitializeDatabaseAsync(logger);
+await app.Services.InitializeDatabaseAsync(logger, app.Environment);
 
 if (app.Environment.IsDevelopment())
 {
