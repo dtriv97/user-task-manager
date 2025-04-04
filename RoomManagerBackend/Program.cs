@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RoomManagerBackend.Data;
+using RoomManagerBackend.Extensions;
 using RoomManagerBackend.Services;
 using RoomManagerBackend.Utilities;
 
@@ -27,7 +28,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     else
     {
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        options.UseNpgsql(connectionString);
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        }
+        options.UseNpgsql(
+            connectionString,
+            npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorCodesToAdd: null
+                );
+            }
+        );
     }
 });
 
@@ -55,11 +70,9 @@ var app = builder.Build();
 
 app.UseCors();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+await app.Services.InitializeDatabaseAsync(logger);
 
 if (app.Environment.IsDevelopment())
 {
